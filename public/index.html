@@ -77,6 +77,7 @@
   }
   .navitem.active .fmtnum{color:var(--amber)}
   .navlabel{font-size:13.5px;font-weight:500;line-height:1.3}
+  .navsep{height:1px;background:var(--line);margin:9px 18px}
 
   /* ============ MAIN ============ */
   .stage{
@@ -143,6 +144,7 @@
   .topp-title{font-size:13px;font-weight:700;color:var(--up)}
   .topp-sub{font-size:10.5px;color:var(--txt-faint);
     font-family:"SF Mono",monospace;letter-spacing:.3px}
+  .topp-sub .live{color:var(--up)}
   .toprows{display:flex;flex-direction:column}
   .toprow{
     display:grid;
@@ -293,6 +295,29 @@
     font-size:11px;color:var(--txt-faint);line-height:1.6;text-align:center;
   }
 
+  /* history */
+  .histlist{display:flex;flex-direction:column;gap:12px}
+  .histcard{background:var(--ink-2);border:1px solid var(--line);
+    border-radius:var(--radius);padding:14px 16px}
+  .histcard .ht{display:flex;justify-content:space-between;align-items:baseline;
+    gap:10px;margin-bottom:8px}
+  .histcard .ht .fmt{font-size:13px;font-weight:700;color:var(--amber)}
+  .histcard .ht .ts{font-size:11px;color:var(--txt-faint);font-family:monospace;white-space:nowrap}
+  .histcard .hp{font-size:12.5px;color:var(--txt-dim);line-height:1.6;
+    direction:ltr;text-align:left;font-family:"SF Mono",monospace;
+    white-space:pre-wrap;word-break:break-word;max-height:78px;overflow:hidden;
+    margin-bottom:11px;border-right:2px solid var(--line);padding-right:10px}
+  .histcard .ha{display:flex;gap:8px}
+  .histempty{color:var(--txt-faint);font-size:14px;padding:24px 0}
+  .smallbtn{font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer;
+    border-radius:7px;padding:6px 12px;border:1px solid var(--line-2);
+    background:transparent;color:var(--txt-dim);transition:.14s}
+  .smallbtn:hover{border-color:var(--amber);color:var(--amber)}
+  .smallbtn.danger:hover{border-color:var(--down);color:var(--down)}
+  .booterr{max-width:560px;margin:80px auto;padding:20px;border-radius:10px;
+    background:#2a1414;border:1px solid #4a1f1f;color:var(--down);
+    font-size:14px;line-height:1.7}
+
   .ticker{
     display:flex;gap:7px;align-items:center;margin-top:7px;
     font-size:12px;color:var(--txt-faint);font-family:monospace;
@@ -318,6 +343,7 @@
     .rail-scroll{
       display:flex;flex-direction:row;overflow-x:auto;padding:8px;gap:6px;
     }
+    .navsep{display:none}
     .navitem{
       flex-direction:column;align-items:flex-start;gap:3px;
       width:auto;white-space:nowrap;border-right:none;
@@ -356,151 +382,147 @@
 </div>
 
 <script>
-/* ---------- option banks ---------- */
-const SECTORS = ["Energy","Information Technology","Industrials","Materials","Software","Cybersecurity","Semiconductors","Financials","Banks","Healthcare","Biotech","Consumer Staples","Consumer Discretionary","Real Estate","Communication Services","Utilities","Aerospace & Defense","Retail"];
-const STOCKS  = ["NVDA","MSFT","AAPL","GOOGL","AMZN","META","TSLA","AVGO","JPM","GS","MS","BAC","WFC","C","CRM","ADBE","ORCL","NOW","SNOW","MDB","CRWD","PANW","ZS","NET","PLTR","XOM","CVX","UNH","LLY","JNJ","ABBV","KO","PG","COST","WMT","HD","V","MA"];
-const STRATS  = ["Swing Trading","Day Trading","Long-term Hold","Momentum","Value","Dividend Growth","Scalping","Breakout","Mean Reversion","Trend Following","Buy & Hold","Options Income"];
+/* ---------- runtime state (loaded from formats.json) ---------- */
+let FORMATS = [];
+let BANKS = {};
+let TOP_SECTORS = [];        // current ranking shown in the panel
+let SECTORS_META = null;     // {live, asOf} from /api/sectors
 
-/* ---------- top-5 growth sectors (trailing ~3 months / YTD 2026) ----------
-   ranked from web research, June 2026. perf = approx YTD/recent move. */
-const TOP_SECTORS = [
-  {name:"Energy", perf:"+29%", note:"המוביל ב-2026 — עליית מחירי נפט ומתחים גיאופוליטיים מזרימים הון לסקטור.", tag:"Top performer"},
-  {name:"Information Technology", perf:"+17%", note:"מס' 2 ב-YTD; ביקוש AI לתשתיות ממשיך לתמוך, למרות תנודתיות.", tag:"AI demand"},
-  {name:"Industrials", perf:"+16%", note:"בנייית מרכזי נתונים, חשמול, הגנה — Caterpillar ו-GE Vernova מובילים.", tag:"AI buildout"},
-  {name:"Materials", perf:"+12%", note:"התאוששות מחירי סחורות וביקוש למתכות לתשתיות AI.", tag:"Commodities"},
-  {name:"Software", perf:"Rebound", note:"זינוק ~44% מהשפל של אפריל; הסייבר מוביל (CrowdStrike, Palo Alto).", tag:"Off the lows"}
-];
-
-/* ---------- 10 prompt formats ----------
-   each placeholder => {key, label, options?, free?, multi?} */
-const FORMATS = [
-  {
-    id:1, title:"Market Analysis", he:"ניתוח שוק",
-    lede:"זיהוי מגמות, דפוסים מתהווים והזדמנויות השקעה — לפי סקטור או מניה נבחרת.",
-    template:(v)=>`Analyze the current trends in the stock market, focusing on {sel}. Identify any emerging patterns and suggest possible investment opportunities. Take into account the latest earnings reports and sector news in your analysis.`,
-    fields:[{key:"sel",label:"סקטור או מניה",ph:"[sector or stock]",options:[...SECTORS,...STOCKS],free:true,multi:true,sectorTop:true}]
-  },
-  {
-    id:2, title:"Portfolio Diversification", he:"פיזור תיק",
-    lede:"אסטרטגיות פיזור והקטנת סיכון לתיק קיים, כולל סקטורים ומניות מומלצים לבחינה.",
-    template:(v)=>`Given a portfolio with a combination of {sel}, suggest strategies to diversify it further and minimize risk. Include potential sectors to explore and specific stocks to consider.`,
-    fields:[{key:"sel",label:"סקטורים / מניות בתיק",ph:"[current sectors or stocks]",options:[...SECTORS,...STOCKS],free:true,multi:true,sectorTop:true}]
-  },
-  {
-    id:3, title:"Risk Management", he:"ניהול סיכונים",
-    lede:"טכניקות ניהול סיכון — stop-loss, פיזור וגודל פוזיציה — ביחס לאסטרטגיה נבחרת.",
-    template:(v)=>`Analyze effective risk management techniques for a stock trader. Provide detailed examples of how to implement stop-loss orders, diversification, and position sizing in a trading strategy. Use {sel} as a reference.`,
-    fields:[{key:"sel",label:"אסטרטגיה / מניות",ph:"[trading strategy or stocks]",options:[...STRATS,...STOCKS],free:true}]
-  },
-  {
-    id:4, title:"Technical Analysis", he:"ניתוח טכני",
-    lede:"הערכת תנועות מחיר, ווליום, ממוצעים נעים ו-RSI — והמלצת קנייה / מכירה / החזקה.",
-    template:(v)=>`Using technical analysis, evaluate the stocks of {sel}. Analyze recent price movements, volume, and key indicators, such as moving averages and the RSI. Provide a recommendation to buy, sell, or hold.`,
-    fields:[{key:"sel",label:"מניות",ph:"[enter stocks]",options:STOCKS,free:true,multi:true}]
-  },
-  {
-    id:5, title:"Economic Indicators", he:"אינדיקטורים כלכליים",
-    lede:"כיצד תמ\"ג, אבטלה ואינפלציה משפיעים על השוק — ואיך לתרגם זאת להחלטות.",
-    template:(v)=>`Explain how various economic indicators, such as GDP, unemployment rates, and inflation, influence stock market performance. Provide examples of how investors can use these indicators to make informed decisions about {sel}.`,
-    fields:[{key:"sel",label:"סקטור או מניות",ph:"[sector or stocks]",options:[...SECTORS,...STOCKS],free:true,multi:true,sectorTop:true}]
-  },
-  {
-    id:6, title:"Value Investing", he:"השקעות ערך",
-    lede:"עקרונות השקעות ערך וזיהוי מניות מתומחרות בחסר — עם דוגמאות מהשוק הנוכחי.",
-    template:(v)=>`Describe the principles of value investing and how to identify undervalued stocks. Use real-world examples, including {sel}, to illustrate how investors can apply this strategy in the current market.`,
-    fields:[{key:"sel",label:"מניות / חברות",ph:"[stocks or companies]",options:STOCKS,free:true,multi:true}]
-  },
-  {
-    id:7, title:"Market Sentiment", he:"סנטימנט שוק",
-    lede:"השפעת הסנטימנט על מחירים, וכלים למדידתו ולשילובו באסטרטגיית מסחר.",
-    template:(v)=>`Analyze how market sentiment influences stock prices. Discuss the tools and techniques that investors can use to assess sentiment and incorporate it into their trading strategies. Focus on {sel}.`,
-    fields:[{key:"sel",label:"מניה או סקטור",ph:"[stock or sector]",options:[...SECTORS,...STOCKS],free:true,multi:true,sectorTop:true}]
-  },
-  {
-    id:8, title:"Results Reports", he:"דוחות כספיים",
-    lede:"איך לקרוא דוח תוצאות — המדדים המרכזיים והשפעתם על מחיר המניה.",
-    template:(v)=>`Explain how to interpret a company's results report. Highlight the key metrics that investors should focus on and how these metrics can affect stock prices. Use {sel}'s latest results report as an example.`,
-    fields:[{key:"sel",label:"חברה",ph:"[company]",options:STOCKS,free:true}]
-  },
-  {
-    id:9, title:"Growth vs Dividend", he:"צמיחה מול דיבידנד",
-    lede:"השוואת מניות צמיחה למניות דיבידנד — יתרונות, סיכונים ומתי כל אחת מתאימה.",
-    template:(v)=>`Compare and contrast growth stocks and dividend stocks. Analyze the advantages and risks of each type of investment and suggest situations in which one might be more suitable than the other. Reference {growth} as growth stocks and {div} as dividend stocks.`,
-    fields:[
-      {key:"growth",label:"מניות צמיחה",ph:"[growth stocks]",options:["NVDA","MSFT","CRM","CRWD","MDB","TSLA","PLTR","NOW","SNOW","NET","AMZN","META"],free:true,multi:true},
-      {key:"div",label:"מניות דיבידנד",ph:"[dividend stocks]",options:["JPM","XOM","KO","PG","JNJ","VZ","CVX","ABBV","MO","T","PEP","O"],free:true,multi:true}
-    ]
-  },
-  {
-    id:10, title:"World Events Impact", he:"השפעת אירועי עולם",
-    lede:"השפעת אירועים גלובליים (מתחים גיאופוליטיים, מגפות) על השוק ואיך להגן על התיק.",
-    template:(v)=>`Analyze the impact of major world events (for example, geopolitical tensions, pandemics) on the stock market. Provide strategies for investors to protect their portfolios during such events. Consider the impact on {sel}.`,
-    fields:[{key:"sel",label:"סקטור או מניה",ph:"[sector or stock]",options:[...SECTORS,...STOCKS],free:true,multi:true,sectorTop:true}]
-  }
-];
-
-/* ---------- state ---------- */
 let active = 0;
-const state = {}; // {formatId: {fieldKey: [values]}}
-FORMATS.forEach(f=>{ state[f.id]={}; f.fields.forEach(fd=>state[f.id][fd.key]=[]); });
+let view = "format";         // 'format' | 'history'
+const state = {};            // {formatId: {fieldKey: [values]}}
 
-/* ---------- build nav ---------- */
-const nav = document.getElementById('nav');
-FORMATS.forEach((f,i)=>{
-  const b=document.createElement('button');
-  b.className='navitem'+(i===0?' active':'');
-  b.innerHTML=`<span class="fmtnum">${String(f.id).padStart(2,'0')}</span><span class="navlabel">${f.he}<br><span style="font-size:10px;color:var(--txt-faint);font-family:monospace">${f.title}</span></span>`;
-  b.onclick=()=>{active=i;render();document.querySelectorAll('.navitem').forEach((n,j)=>n.classList.toggle('active',j===i));
-    document.getElementById('stage').scrollTo({top:0,behavior:'smooth'});};
-  nav.appendChild(b);
-});
+/* ---------- small helpers ---------- */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function scrollTop(){ const st=document.getElementById('stage'); if(st) st.scrollTo({top:0,behavior:'smooth'}); }
+function fmtTs(iso){
+  try{ return new Date(iso).toLocaleString('he-IL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+  catch(_){ return ''; }
+}
+function expandOptions(arr){
+  const out=[];
+  (arr||[]).forEach(o=>{
+    if(o==='@SECTORS') out.push(...(BANKS.SECTORS||[]));
+    else if(o==='@STOCKS') out.push(...(BANKS.STOCKS||[]));
+    else if(o==='@STRATS') out.push(...(BANKS.STRATS||[]));
+    else out.push(o);
+  });
+  return out;
+}
 
-/* ---------- render screen ---------- */
+/* ---------- bootstrap ---------- */
+async function boot(){
+  try{
+    const r=await fetch('formats.json',{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data=await r.json();
+    BANKS=data.banks||{};
+    TOP_SECTORS=data.topSectorsFallback||[];
+    FORMATS=(data.formats||[]).map(f=>({
+      ...f,
+      fields:(f.fields||[]).map(fd=>({...fd, options:expandOptions(fd.options)}))
+    }));
+    if(!FORMATS.length) throw new Error('no formats');
+  }catch(e){
+    document.getElementById('screen').innerHTML =
+      `<div class="booterr">שגיאה בטעינת התבניות (formats.json). ודא/י שהקובץ קיים ושהשרת רץ, ורענן/י את הדף.</div>`;
+    return;
+  }
+  FORMATS.forEach(f=>{ state[f.id]={}; f.fields.forEach(fd=>state[f.id][fd.key]=[]); });
+  buildNav();
+  render();
+  setActiveNav();
+  loadSectors(); // live feed; re-renders when ready
+}
+
+async function loadSectors(){
+  try{
+    const r=await fetch('/api/sectors',{cache:'no-store'});
+    if(!r.ok) return;
+    const d=await r.json();
+    if(d && Array.isArray(d.topSectors) && d.topSectors.length){
+      TOP_SECTORS=d.topSectors;
+      SECTORS_META={live:!!d.live, asOf:d.asOf};
+      if(view==='format') render();
+    }
+  }catch(_){ /* keep fallback */ }
+}
+
+/* ---------- nav ---------- */
+function buildNav(){
+  const nav=document.getElementById('nav');
+  nav.innerHTML='';
+  FORMATS.forEach((f,i)=>{
+    const b=document.createElement('button');
+    b.className='navitem';
+    b.innerHTML=`<span class="fmtnum">${String(f.id).padStart(2,'0')}</span><span class="navlabel">${esc(f.he)}<br><span style="font-size:10px;color:var(--txt-faint);font-family:monospace">${esc(f.title)}</span></span>`;
+    b.onclick=()=>{ view='format'; active=i; render(); setActiveNav(); scrollTop(); };
+    nav.appendChild(b);
+  });
+  const sep=document.createElement('div'); sep.className='navsep'; nav.appendChild(sep);
+  const h=document.createElement('button');
+  h.className='navitem nav-history'; h.id='navhist';
+  h.innerHTML=`<span class="fmtnum">★</span><span class="navlabel">היסטוריה<br><span style="font-size:10px;color:var(--txt-faint);font-family:monospace">History</span></span>`;
+  h.onclick=()=>{ view='history'; renderHistory(); setActiveNav(); scrollTop(); };
+  nav.appendChild(h);
+}
+function setActiveNav(){
+  document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));
+  if(view==='history'){ const hn=document.getElementById('navhist'); if(hn) hn.classList.add('active'); }
+  else { const items=document.querySelectorAll('.navitem:not(.nav-history)'); if(items[active]) items[active].classList.add('active'); }
+}
+
+/* ---------- render format screen ---------- */
 function render(){
+  if(view==='history'){ renderHistory(); return; }
   const f=FORMATS[active];
   const s=document.getElementById('screen');
+
+  const subText = SECTORS_META && SECTORS_META.live
+    ? `<span class="live">● נתונים חיים</span> · ETFs לפי תשואת 3 חודשים${SECTORS_META.asOf?(' · עודכן '+esc(SECTORS_META.asOf)):''}`
+    : `נתוני פולבק · מבוסס מחקר שוק (יוני 2026)`;
 
   const fieldsHTML = f.fields.map(fd=>{
     const sel = state[f.id][fd.key];
     const chips = fd.options.map(o=>{
       const on = sel.includes(o);
-      return `<button class="chip${on?' on':''}" data-fid="${f.id}" data-fk="${fd.key}" data-val="${o}" data-multi="${!!fd.multi}">${o}</button>`;
+      return `<button class="chip${on?' on':''}" data-fid="${f.id}" data-fk="${esc(fd.key)}" data-val="${esc(o)}" data-multi="${!!fd.multi}">${esc(o)}</button>`;
     }).join('');
     const freeVal = sel.filter(v=>!fd.options.includes(v)).join(', ');
-    const free = fd.free ? `<input class="freeinput" data-fid="${f.id}" data-fk="${fd.key}" placeholder="או הקלד/י ערך משלך…" value="${freeVal.replace(/"/g,'&quot;')}">` : '';
+    const free = fd.free ? `<input class="freeinput" data-fid="${f.id}" data-fk="${esc(fd.key)}" placeholder="או הקלד/י ערך משלך…" value="${esc(freeVal)}">` : '';
     let topPanel='';
     if(fd.sectorTop){
       const rows=TOP_SECTORS.map((t,i)=>{
         const on=sel.includes(t.name);
-        return `<button class="toprow${on?' on':''}" data-fid="${f.id}" data-fk="${fd.key}" data-val="${t.name}">
+        return `<button class="toprow${on?' on':''}" data-fid="${f.id}" data-fk="${esc(fd.key)}" data-val="${esc(t.name)}">
           <span class="toprank">${i+1}</span>
-          <span class="topname">${t.name}</span>
-          <span class="topperf">${t.perf}</span>
-          <span class="toptag">${t.tag}</span>
-          <span class="topnote">${t.note}</span>
+          <span class="topname">${esc(t.name)}</span>
+          <span class="topperf">${esc(t.perf)}</span>
+          <span class="toptag">${esc(t.tag||'')}</span>
+          <span class="topnote">${esc(t.note||'')}</span>
           <span class="topadd">${on?'✓ נבחר':'+ הוסף'}</span>
         </button>`;
       }).join('');
       topPanel=`<div class="toppanel">
         <div class="topp-head">
           <span class="topp-title">⚡ 5 הסקטורים עם פוטנציאל הצמיחה הגבוה — 3 חודשים אחרונים</span>
-          <span class="topp-sub">YTD 2026 · מבוסס נתוני שוק שנאספו ביוני 2026</span>
+          <span class="topp-sub">${subText}</span>
         </div>
         <div class="toprows">${rows}</div>
       </div>`;
     }
     return `<div class="field">
       ${topPanel}
-      <div class="field-label">${fd.label} <span class="ph">${fd.ph}</span></div>
+      <div class="field-label">${esc(fd.label)} <span class="ph">${esc(fd.ph)}</span></div>
       <div class="chips">${chips}</div>
       ${free}
     </div>`;
   }).join('');
 
   s.innerHTML = `
-    <div class="crumb">Prompt Terminal <span class="sep">/</span> Format ${String(f.id).padStart(2,'0')} <span class="sep">/</span> <span class="cur">${f.title}</span></div>
-    <h1>${f.he}</h1>
-    <p class="lede">${f.lede}</p>
+    <div class="crumb">Prompt Terminal <span class="sep">/</span> Format ${String(f.id).padStart(2,'0')} <span class="sep">/</span> <span class="cur">${esc(f.title)}</span></div>
+    <h1>${esc(f.he)}</h1>
+    <p class="lede">${esc(f.lede)}</p>
     <div class="fields">${fieldsHTML}</div>
     <div class="promptcard">
       <div class="promptcard-head">
@@ -513,7 +535,7 @@ function render(){
       <div class="prompt-body" id="pbody"></div>
     </div>
     <div id="resultwrap"></div>
-    <div class="hint"><span class="i">i</span><span>בחר/י ערך אחד או יותר מהצ'יפים, או הקלד/י ערך חופשי. הפרומפט מתעדכן בזמן אמת — לחיצה על COPY מעתיקה אותו מוכן לשליחה.</span></div>
+    <div class="hint"><span class="i">i</span><span>בחר/י ערך אחד או יותר מהצ'יפים, או הקלד/י ערך חופשי. הפרומפט מתעדכן בזמן אמת — COPY מעתיק אותו, ו-▶ הרץ שולח אותו למודל ומציג את התשובה בזרימה (streaming). כל הרצה נשמרת בהיסטוריה.</span></div>
     <div class="footnote">⚠ DESK הוא כלי חינוכי / מחקרי בלבד. התוכן והתשובות אינם מהווים ייעוץ השקעות, שיווק השקעות או המלצה לפעולה. אין להסתמך עליהם לקבלת החלטות פיננסיות.</div>
   `;
 
@@ -525,14 +547,14 @@ function render(){
       const idx=arr.indexOf(val);
       if(multi==='true'){ idx>-1?arr.splice(idx,1):arr.push(val); }
       else {
-        // single-select among option chips: clear other option-values, keep free text
-        const free=arr.filter(v=>!FORMATS[active].fields.find(x=>x.key===fk).options.includes(v));
+        const opts=FORMATS[active].fields.find(x=>x.key===fk).options;
+        const free=arr.filter(v=>!opts.includes(v));
         state[fid][fk]= idx>-1 ? free : [...free,val];
       }
       render();
     };
   });
-  // top-sector row handlers (multi add/remove)
+  // top-sector rows (multi add/remove)
   s.querySelectorAll('.toprow').forEach(r=>{
     r.onclick=()=>{
       const {fid,fk,val}=r.dataset;
@@ -542,7 +564,7 @@ function render(){
       render();
     };
   });
-  // free input handlers
+  // free input
   s.querySelectorAll('.freeinput').forEach(inp=>{
     inp.oninput=()=>{
       const {fid,fk}=inp.dataset;
@@ -560,31 +582,22 @@ function render(){
 }
 
 /* ---------- assemble + paint prompt ---------- */
-function buildVals(){
-  const f=FORMATS[active];
-  const out={};
-  f.fields.forEach(fd=>{ out[fd.key]=state[f.id][fd.key]; });
-  return out;
-}
 function paintPrompt(){
   const f=FORMATS[active];
-  let tpl=f.template({});
-  // replace each {key} with styled slot (display) — store plain too
-  const display = tpl.replace(/\{(\w+)\}/g,(m,k)=>{
+  const display = String(f.template).replace(/\{(\w+)\}/g,(m,k)=>{
     const vals=state[f.id][k]||[];
     if(!vals.length){
       const fd=f.fields.find(x=>x.key===k);
-      return `<span class="slot empty">${fd?fd.ph:('['+k+']')}</span>`;
+      return `<span class="slot empty">${esc(fd?fd.ph:('['+k+']'))}</span>`;
     }
-    return `<span class="slot">${vals.join(', ')}</span>`;
+    return `<span class="slot">${esc(vals.join(', '))}</span>`;
   });
   const body=document.getElementById('pbody');
   if(body) body.innerHTML=display;
 }
 function plainPrompt(){
   const f=FORMATS[active];
-  let tpl=f.template({});
-  return tpl.replace(/\{(\w+)\}/g,(m,k)=>{
+  return String(f.template).replace(/\{(\w+)\}/g,(m,k)=>{
     const vals=state[f.id][k]||[];
     if(!vals.length){ const fd=f.fields.find(x=>x.key===k); return fd?fd.ph:('['+k+']'); }
     return vals.join(', ');
@@ -601,9 +614,8 @@ function copyPrompt(){
   });
 }
 
-/* ---------- run prompt through the backend ---------- */
+/* ---------- minimal markdown ---------- */
 function mdLite(t){
-  // minimal, safe-ish markdown → html for display
   let h=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
   h=h.replace(/^### (.+)$/gm,'<h4>$1</h4>');
@@ -615,43 +627,127 @@ function mdLite(t){
   return '<p>'+h+'</p>';
 }
 
+/* ---------- history (localStorage) ---------- */
+const HKEY='desk_history';
+function loadHist(){ try{ return JSON.parse(localStorage.getItem(HKEY)||'[]'); }catch(_){ return []; } }
+function saveHist(list){ try{ localStorage.setItem(HKEY, JSON.stringify(list.slice(0,30))); }catch(_){} }
+function startHistory(prompt){
+  const f=FORMATS[active];
+  const id=Date.now();
+  const entry={ id, ts:new Date().toISOString(), formatId:f.id, formatTitle:f.title, he:f.he,
+    prompt, response:'', snapshot:JSON.parse(JSON.stringify(state[f.id])) };
+  const l=loadHist(); l.unshift(entry); saveHist(l);
+  return id;
+}
+function finishHistory(id, response){
+  const l=loadHist(); const e=l.find(x=>x.id===id); if(e){ e.response=response; saveHist(l); }
+}
+function restoreHistory(id){
+  const h=loadHist().find(x=>x.id===id); if(!h) return;
+  const idx=FORMATS.findIndex(f=>f.id===h.formatId); if(idx<0) return;
+  active=idx; view='format';
+  if(h.snapshot) state[h.formatId]=JSON.parse(JSON.stringify(h.snapshot));
+  render(); setActiveNav(); scrollTop();
+}
+function renderHistory(){
+  const s=document.getElementById('screen');
+  const list=loadHist();
+  const rows=list.map(h=>`
+    <div class="histcard">
+      <div class="ht"><span class="fmt">${esc(h.he)} · ${esc(h.formatTitle)}</span><span class="ts">${esc(fmtTs(h.ts))}</span></div>
+      <div class="hp">${esc(h.prompt)}</div>
+      <div class="ha">
+        <button class="smallbtn" data-act="restore" data-id="${h.id}">↩ שחזר</button>
+        <button class="smallbtn danger" data-act="del" data-id="${h.id}">🗑 מחק</button>
+      </div>
+    </div>`).join('');
+  s.innerHTML=`
+    <div class="crumb">Prompt Terminal <span class="sep">/</span> <span class="cur">History</span></div>
+    <h1>היסטוריה</h1>
+    <p class="lede">הפרומפטים האחרונים שהרצת, נשמרים מקומית בדפדפן (עד 30). "שחזר" טוען בחזרה את הפורמט והבחירות.</p>
+    ${ list.length
+        ? `<div style="margin-bottom:16px"><button class="smallbtn danger" id="clearhist">נקה הכל</button></div><div class="histlist">${rows}</div>`
+        : `<div class="histempty">אין עדיין היסטוריה. הרץ פרומפט (▶ הרץ) והוא יישמר כאן.</div>` }
+    <div class="footnote">⚠ DESK הוא כלי חינוכי / מחקרי בלבד. התוכן והתשובות אינם מהווים ייעוץ השקעות.</div>
+  `;
+  const clr=document.getElementById('clearhist');
+  if(clr) clr.onclick=()=>{ saveHist([]); renderHistory(); };
+  s.querySelectorAll('.smallbtn[data-act]').forEach(b=>{
+    b.onclick=()=>{
+      const id=Number(b.dataset.id);
+      if(b.dataset.act==='del'){ saveHist(loadHist().filter(x=>x.id!==id)); renderHistory(); }
+      else if(b.dataset.act==='restore'){ restoreHistory(id); }
+    };
+  });
+}
+
+/* ---------- run prompt (streaming via /api/run SSE) ---------- */
 async function runPrompt(){
   const btn=document.getElementById('run');
   const wrap=document.getElementById('resultwrap');
   btn.disabled=true;
   const orig=btn.querySelector('span').textContent;
   btn.querySelector('span').textContent='…מריץ';
+
+  const promptText=plainPrompt();
+  const histId=startHistory(promptText);
+
   wrap.innerHTML=`<div class="resultcard">
       <div class="result-head"><span class="rh-dot"></span> CLAUDE · תשובה<span class="rh-load">מנתח את השוק…</span></div>
       <div class="result-body" id="rbody"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton w70"></div></div>
     </div>`;
   wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const rb=document.getElementById('rbody');
+  const disc=`<div class="disclaimer">⚠ תוכן חינוכי בלבד, לא ייעוץ השקעות. נתוני שוק עשויים להיות לא מעודכנים.</div>`;
+  let acc='', firstChunk=true, errored=false;
+  const dropLoader=()=>{ const l=document.querySelector('.rh-load'); if(l) l.remove(); };
 
   try{
-    // Calls our own backend route, which holds the API key server-side
-    // and forwards the prompt to the model provider.
-    const res=await fetch("/api/run",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({prompt:plainPrompt()})
+    const res=await fetch('/api/run',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:promptText})
     });
-    const data=await res.json().catch(()=>({}));
-    if(!res.ok){ throw new Error(data && data.error ? data.error : ("HTTP "+res.status)); }
-    const text=(data.text||"").trim();
-    const rb=document.getElementById('rbody');
-    const l=document.querySelector('.rh-load'); if(l) l.remove();
-    rb.innerHTML=mdLite(text||"לא התקבלה תשובה. נסה/י שוב.")+
-      `<div class="disclaimer">⚠ תוכן חינוכי בלבד, לא ייעוץ השקעות. נתוני שוק עשויים להיות לא מעודכנים.</div>`;
+    if(!res.ok || !res.body){
+      const d=await res.json().catch(()=>({}));
+      throw new Error(d && d.error ? d.error : ('HTTP '+res.status));
+    }
+    const reader=res.body.getReader();
+    const dec=new TextDecoder();
+    let buf='';
+    while(true){
+      const {value,done}=await reader.read();
+      if(done) break;
+      buf+=dec.decode(value,{stream:true});
+      let nl;
+      while((nl=buf.indexOf('\n\n'))>=0){
+        const block=buf.slice(0,nl); buf=buf.slice(nl+2);
+        const line=block.split('\n').find(l=>l.startsWith('data:'));
+        if(!line) continue;
+        let evt; try{ evt=JSON.parse(line.slice(5).trim()); }catch(_){ continue; }
+        if(evt.type==='delta'){
+          if(firstChunk){ dropLoader(); firstChunk=false; }
+          acc+=evt.text;
+          rb.innerHTML=mdLite(acc)+disc;
+        }else if(evt.type==='error'){
+          errored=true; dropLoader();
+          rb.innerHTML=`<div class="errbox">${esc(evt.error||'החיבור נכשל.')}</div>`;
+        }else if(evt.type==='done'){
+          dropLoader();
+          rb.innerHTML=mdLite(acc||'לא התקבלה תשובה. נסה/י שוב.')+disc;
+        }
+      }
+    }
+    if(!errored) finishHistory(histId, acc);
   }catch(e){
-    const rb=document.getElementById('rbody');
+    dropLoader();
     if(rb) rb.innerHTML=`<div class="errbox">החיבור נכשל. ודא/י חיבור לרשת ונסה/י שוב.</div>`;
-    const l=document.querySelector('.rh-load'); if(l) l.remove();
   }finally{
-    btn.disabled=false;btn.querySelector('span').textContent=orig;
+    btn.disabled=false; btn.querySelector('span').textContent=orig;
   }
 }
 
-render();
+boot();
 </script>
 </body>
 </html>

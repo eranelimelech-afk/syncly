@@ -14,12 +14,32 @@ the model.
 
 ```
 public/index.html   ← the whole frontend (pure HTML/CSS/vanilla JS, no build step)
-server.js           ← Node http server: serves static files + POST /api/run
+public/formats.json ← the 10 templates + option banks (editable without touching code)
+server.js           ← Node http server: static files + /api/run + /api/sectors
 ```
 
-`POST /api/run` accepts `{ "prompt": "..." }`, calls the Claude Messages API with
-the key from `ANTHROPIC_API_KEY`, and returns `{ "text": "..." }`. The key is
-never exposed to the client.
+### Routes
+
+- `POST /api/run` — accepts `{ "prompt": "..." }`, calls the Claude Messages API
+  with the key from `ANTHROPIC_API_KEY`, and **streams** the answer back as
+  Server-Sent Events (`{type:"delta",text} | {type:"error",error} | {type:"done"}`).
+  The key is never exposed to the client; the upstream request is aborted if the
+  browser disconnects.
+- `GET /api/sectors` — returns the top-5 sector ETFs ranked by trailing ~3-month
+  return (live, keyless feed via Yahoo Finance, cached server-side for 1 hour).
+  Falls back to a static ranking when the feed is unreachable, so the UI always
+  has data.
+
+## Features
+
+- **Streaming responses** — the model answer renders token-by-token inline.
+- **Live sector panel** — the "top-5 growth sectors" panel is driven by `/api/sectors`
+  (live ETF performance) with a static fallback.
+- **Run history** — every run is saved to `localStorage` (last 30); the History view
+  lets you restore the exact format + selections or delete entries.
+- **Editable templates** — `public/formats.json` holds all 10 templates, option
+  banks (`@SECTORS` / `@STOCKS` / `@STRATS` tokens expand to the chip lists), and
+  the sector fallback. Non-developers can edit it without touching the app code.
 
 ## Run locally
 
@@ -43,15 +63,15 @@ return an error until `ANTHROPIC_API_KEY` is configured.
 | `ANTHROPIC_MAX_TOKENS` | `2048` | Max output tokens per response. |
 | `PORT` | `3000` | HTTP port. |
 
-## Code landmarks (frontend)
+## Code landmarks
 
-- `const FORMATS` — the 10 templates and their fields.
-- `const SECTORS / STOCKS / STRATS` — the option banks (chips).
-- `const TOP_SECTORS` — the ranked growth panel data (hardcoded, June 2026).
-- `function render()` — builds each screen.
+- `public/formats.json` — the 10 templates, option banks, and sector fallback.
+- `boot()` (index.html) — loads `formats.json`, builds the UI, then fetches live sectors.
+- `function render()` — builds each format screen.
 - `function plainPrompt()` — assembles the final prompt string.
-- `async function runPrompt()` — POSTs to `/api/run` and renders the response.
-- `function mdLite()` — minimal markdown→HTML for the response panel.
+- `async function runPrompt()` — POSTs to `/api/run` and renders the streamed response.
+- `loadHist()/saveHist()/renderHistory()` — the localStorage run history.
+- `buildSectors()` (server.js) — fetches/ranks sector ETFs for `/api/sectors`.
 
 ## Compliance
 
