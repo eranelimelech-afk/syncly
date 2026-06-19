@@ -642,6 +642,17 @@ function startHistory(prompt){
 function finishHistory(id, response){
   const l=loadHist(); const e=l.find(x=>x.id===id); if(e){ e.response=response; saveHist(l); }
 }
+function exportHistory(){
+  const list=loadHist();
+  if(!list.length) return;
+  const blob=new Blob([JSON.stringify(list,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='desk-history-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 function restoreHistory(id){
   const h=loadHist().find(x=>x.id===id); if(!h) return;
   const idx=FORMATS.findIndex(f=>f.id===h.formatId); if(idx<0) return;
@@ -666,10 +677,12 @@ function renderHistory(){
     <h1>היסטוריה</h1>
     <p class="lede">הפרומפטים האחרונים שהרצת, נשמרים מקומית בדפדפן (עד 30). "שחזר" טוען בחזרה את הפורמט והבחירות.</p>
     ${ list.length
-        ? `<div style="margin-bottom:16px"><button class="smallbtn danger" id="clearhist">נקה הכל</button></div><div class="histlist">${rows}</div>`
+        ? `<div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap"><button class="smallbtn" id="exporthist">⬇ ייצא JSON</button><button class="smallbtn danger" id="clearhist">נקה הכל</button></div><div class="histlist">${rows}</div>`
         : `<div class="histempty">אין עדיין היסטוריה. הרץ פרומפט (▶ הרץ) והוא יישמר כאן.</div>` }
     <div class="footnote">⚠ DESK הוא כלי חינוכי / מחקרי בלבד. התוכן והתשובות אינם מהווים ייעוץ השקעות.</div>
   `;
+  const exp=document.getElementById('exporthist');
+  if(exp) exp.onclick=exportHistory;
   const clr=document.getElementById('clearhist');
   if(clr) clr.onclick=()=>{ saveHist([]); renderHistory(); };
   s.querySelectorAll('.smallbtn[data-act]').forEach(b=>{
@@ -685,12 +698,16 @@ function renderHistory(){
 async function runPrompt(){
   const btn=document.getElementById('run');
   const wrap=document.getElementById('resultwrap');
-  btn.disabled=true;
-  const orig=btn.querySelector('span').textContent;
-  btn.querySelector('span').textContent='…מריץ';
+  const ORIG='▶ הרץ';
 
   const promptText=plainPrompt();
   const histId=startHistory(promptText);
+
+  // The run button doubles as a stop button while streaming.
+  const ctrl=new AbortController();
+  let stopped=false;
+  btn.querySelector('span').textContent='⏹ עצור';
+  btn.onclick=()=>{ stopped=true; ctrl.abort(); };
 
   wrap.innerHTML=`<div class="resultcard">
       <div class="result-head"><span class="rh-dot"></span> CLAUDE · תשובה<span class="rh-load">מנתח את השוק…</span></div>
@@ -699,6 +716,7 @@ async function runPrompt(){
   wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
   const rb=document.getElementById('rbody');
   const disc=`<div class="disclaimer">⚠ תוכן חינוכי בלבד, לא ייעוץ השקעות. נתוני שוק עשויים להיות לא מעודכנים.</div>`;
+  const stopNote=`<div class="disclaimer">⏹ ההרצה נעצרה על ידך — מוצג רק החלק שהתקבל.</div>`;
   let acc='', firstChunk=true, errored=false;
   const dropLoader=()=>{ const l=document.querySelector('.rh-load'); if(l) l.remove(); };
 
@@ -706,7 +724,8 @@ async function runPrompt(){
     const res=await fetch('/api/run',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt:promptText})
+      body:JSON.stringify({prompt:promptText}),
+      signal:ctrl.signal
     });
     if(!res.ok || !res.body){
       const d=await res.json().catch(()=>({}));
@@ -741,9 +760,16 @@ async function runPrompt(){
     if(!errored) finishHistory(histId, acc);
   }catch(e){
     dropLoader();
-    if(rb) rb.innerHTML=`<div class="errbox">החיבור נכשל. ודא/י חיבור לרשת ונסה/י שוב.</div>`;
+    if(stopped || (e && e.name==='AbortError')){
+      // Graceful user stop: keep whatever streamed in so far.
+      if(rb) rb.innerHTML=(acc?mdLite(acc):'<p style="color:var(--txt-faint)">לא התקבל טקסט לפני העצירה.</p>')+stopNote;
+      finishHistory(histId, acc);
+    }else{
+      if(rb) rb.innerHTML=`<div class="errbox">החיבור נכשל. ודא/י חיבור לרשת ונסה/י שוב.</div>`;
+    }
   }finally{
-    btn.disabled=false; btn.querySelector('span').textContent=orig;
+    btn.querySelector('span').textContent=ORIG;
+    btn.onclick=runPrompt;
   }
 }
 
