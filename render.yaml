@@ -1,0 +1,19 @@
+# Render.com blueprint — deploy DESK as a Node web service.
+# In Render: New → Blueprint → point at this repo. Then set ANTHROPIC_API_KEY
+# in the service's Environment tab (it is marked sync:false so it is never
+# committed to the repo).
+services:
+  - type: web
+    name: desk-prompt-terminal
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-opus-4-8
+      - key: ANTHROPIC_MAX_TOKENS
+        value: "2048"

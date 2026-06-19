@@ -61,7 +61,44 @@ return an error until `ANTHROPIC_API_KEY` is configured.
 | `ANTHROPIC_API_KEY` | — | **Required** for RUN. Held server-side only. |
 | `ANTHROPIC_MODEL` | `claude-opus-4-8` | Model used for the run route. |
 | `ANTHROPIC_MAX_TOKENS` | `2048` | Max output tokens per response. |
-| `PORT` | `3000` | HTTP port. |
+| `PORT` | `3000` | HTTP port (hosting platforms set this for you). |
+
+## Deploy
+
+The app has no build step and binds to `PORT` — it runs anywhere that can run a
+Node process. **Set `ANTHROPIC_API_KEY` as a secret on the platform; never commit it.**
+
+### Docker
+
+```bash
+docker build -t desk .
+docker run -p 3000:3000 -e ANTHROPIC_API_KEY="sk-ant-..." desk
+# → http://localhost:3000
+```
+
+### Render (blueprint included)
+
+This repo ships a `render.yaml`. In Render: **New → Blueprint → pick this repo**,
+then set `ANTHROPIC_API_KEY` in the service's **Environment** tab. Render provides
+`PORT` automatically. (Manual setup without the blueprint: Build `npm ci --omit=dev`,
+Start `npm start`.)
+
+### Railway
+
+**New Project → Deploy from GitHub repo.** Railway detects Node and runs `npm start`.
+Add `ANTHROPIC_API_KEY` under **Variables**. `PORT` is injected automatically.
+
+### Fly.io
+
+```bash
+fly launch --no-deploy          # detects the Dockerfile, generates fly.toml
+fly secrets set ANTHROPIC_API_KEY="sk-ant-..."
+fly deploy
+```
+
+> Note: the live sector feed (`/api/sectors`) makes an outbound request to Yahoo
+> Finance. If the host blocks outbound traffic it falls back to static data — the
+> app keeps working either way.
 
 ## Code landmarks
 
