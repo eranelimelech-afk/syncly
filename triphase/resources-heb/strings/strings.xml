@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Hebrew overlay (spec section 10). Deliberately limited to phone-app setting
+  titles, which the Connect IQ mobile app renders correctly. On-watch labels
+  fall back to the English single-word tokens until a Hebrew bitmap font
+  (27 letters + digits) is generated and validated on hardware - the simulator
+  does not draw Hebrew glyphs, so a Hebrew watch layout cannot be verified
+  before sideloading. Every title is kept to a short phrase with no mixed
+  direction, since Monkey C performs no bidi reordering.
+-->
+<resources>
+    <strings>
+        <string id="SetEmphasisMode">מצב הדגשה</string>
+        <string id="SetMorningStart">תחילת בוקר (דקות מחצות)</string>
+        <string id="SetDayStart">תחילת יום (דקות מחצות)</string>
+        <string id="SetEveningStart">תחילת ערב (דקות מחצות)</string>
+        <string id="SetAccentColor">צבע הדגשה</string>
+        <string id="SetShowSeconds">הצגת שניות</string>
+        <string id="SetShowWeekday">הצגת ימי השבוע</string>
+        <string id="SetShowTicks">הצגת שנתות</string>
+        <string id="SetStepGoalOverride">יעד צעדים (0 = יעד השעון)</string>
+        <string id="SetAodFields">שדות במסך תמידי</string>
+        <string id="SetDateFormat">תבנית תאריך</string>
+
+        <string id="SetSlotHrv">שדה שמאלי עליון</string>
+        <string id="SetSlotBat">שדה ימני עליון</string>
+        <string id="SetSlotBb">חוגה שמאלית</string>
+        <string id="SetSlotRec">חוגה ימנית</string>
+        <string id="SetSlotCal">שדה מרכזי</string>
+        <string id="SetSlotSleep">שדה אמצעי שמאלי</string>
+        <string id="SetSlotHr">שדה אמצעי ימני</string>
+        <string id="SetSlotInt">שדה תחתון שמאלי</string>
+        <string id="SetSlotNext">שדה תחתון מרכזי</string>
+        <string id="SetSlotSun">שדה תחתון ימני</string>
+        <string id="SetSlotSteps">שדה תחתון</string>
+
+        <string id="EmphAuto">אוטומטי (לפי שעה)</string>
+        <string id="EmphMorning">בוקר</string>
+        <string id="EmphDay">יום</string>
+        <string id="EmphEvening">ערב</string>
+        <string id="EmphFlat">שטוח (ללא הדגשה)</string>
+
+        <string id="MetricHrv">HRV / עומס</string>
+        <string id="MetricBattery">סוללת השעון</string>
+        <string id="MetricBodyBattery">Body Battery</string>
+        <string id="MetricRecovery">זמן התאוששות</string>
+        <string id="MetricCalories">קלוריות</string>
+        <string id="MetricSleep">ציון שינה</string>
+        <string id="MetricHeartRate">דופק</string>
+        <string id="MetricIntensity">דקות אינטנסיביות</string>
+        <string id="MetricNextEvent">אירוע הבא</string>
+        <string id="MetricSun">זריחה / שקיעה</string>
+        <string id="MetricSteps">צעדים</string>
+        <string id="MetricStress">עומס</string>
+    </strings>
+</resources>

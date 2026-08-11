@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <strings>
+        <string id="AppName">TriPhase</string>
+
+        <!-- Date header: "11.08 · WEEK 33" -->
+        <string id="WeekPrefix">· WEEK</string>
+
+        <!-- On-watch field labels: uppercase, single word (spec section 10) -->
+        <string id="LabelHrv">HRV</string>
+        <string id="LabelBattery">BAT</string>
+        <string id="LabelBodyBattery">BODY</string>
+        <string id="LabelRecovery">RECOV</string>
+        <string id="LabelCalories">CAL</string>
+        <string id="LabelSleep">SLEEP</string>
+        <string id="LabelHeartRate">HR</string>
+        <string id="LabelIntensity">INT</string>
+        <string id="LabelNextEvent">NEXT</string>
+        <string id="LabelSunrise">RISE</string>
+        <string id="LabelSunset">SET</string>
+        <string id="LabelSteps">STEPS</string>
+        <string id="LabelStress">STRESS</string>
+
+        <!-- Settings titles -->
+        <string id="SetEmphasisMode">Emphasis mode</string>
+        <string id="SetMorningStart">Morning starts (minutes past midnight)</string>
+        <string id="SetDayStart">Day starts (minutes past midnight)</string>
+        <string id="SetEveningStart">Evening starts (minutes past midnight)</string>
+        <string id="SetAccentColor">Accent color</string>
+        <string id="SetShowSeconds">Show seconds</string>
+        <string id="SetShowWeekday">Show weekday strip</string>
+        <string id="SetShowTicks">Show tick ring</string>
+        <string id="SetStepGoalOverride">Step goal override (0 = device goal)</string>
+        <string id="SetAodFields">Always-on fields</string>
+        <string id="SetDateFormat">Date format</string>
+
+        <!-- Field slot titles, named by position on the face -->
+        <string id="SetSlotHrv">Top left field</string>
+        <string id="SetSlotBat">Top right field</string>
+        <string id="SetSlotBb">Left sub-dial</string>
+        <string id="SetSlotRec">Right sub-dial</string>
+        <string id="SetSlotCal">Center field</string>
+        <string id="SetSlotSleep">Mid left field</string>
+        <string id="SetSlotHr">Mid right field</string>
+        <string id="SetSlotInt">Lower left field</string>
+        <string id="SetSlotNext">Lower center field</string>
+        <string id="SetSlotSun">Lower right field</string>
+        <string id="SetSlotSteps">Bottom field</string>
+
+        <!-- List entries -->
+        <string id="EmphAuto">Auto (time of day)</string>
+        <string id="EmphMorning">Morning</string>
+        <string id="EmphDay">Day</string>
+        <string id="EmphEvening">Evening</string>
+        <string id="EmphFlat">Flat (no emphasis)</string>
+
+        <string id="AccentGold">Gold</string>
+        <string id="AccentSteel">Steel</string>
+        <string id="AccentJade">Jade</string>
+        <string id="AccentEmber">Ember</string>
+        <string id="AccentWhite">White</string>
+
+        <string id="AodTimeOnly">Time only</string>
+        <string id="AodTimeBb">Time + Body Battery</string>
+        <string id="AodTimeBbSteps">Time + Body Battery + Steps</string>
+        <string id="AodTimeBattery">Time + Watch battery</string>
+
+        <string id="DateDdMm">DD.MM</string>
+        <string id="DateMmDd">MM.DD</string>
+
+        <!-- Metric names for the slot pickers -->
+        <string id="MetricHrv">HRV / Stress</string>
+        <string id="MetricBattery">Watch battery</string>
+        <string id="MetricBodyBattery">Body Battery</string>
+        <string id="MetricRecovery">Recovery time</string>
+        <string id="MetricCalories">Calories</string>
+        <string id="MetricSleep">Sleep score</string>
+        <string id="MetricHeartRate">Heart rate</string>
+        <string id="MetricIntensity">Intensity minutes</string>
+        <string id="MetricNextEvent">Next event</string>
+        <string id="MetricSun">Sunrise / Sunset</string>
+        <string id="MetricSteps">Steps</string>
+        <string id="MetricStress">Stress</string>
+    </strings>
+</resources>

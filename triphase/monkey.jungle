@@ -1,0 +1,7 @@
+project.manifest = manifest.xml
+
+# Language resources use the standard folder convention: resources/ is the
+# English default; resources-heb/ overlays Hebrew strings automatically for
+# devices set to Hebrew. The Hebrew overlay currently covers phone-app setting
+# titles only; on-watch labels intentionally fall back to English tokens until
+# a Hebrew bitmap font is validated on hardware (spec section 10).

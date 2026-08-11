@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <settings>
+        <setting propertyKey="@Properties.emphasisMode" title="@Strings.SetEmphasisMode">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.EmphAuto</listEntry>
+                <listEntry value="1">@Strings.EmphMorning</listEntry>
+                <listEntry value="2">@Strings.EmphDay</listEntry>
+                <listEntry value="3">@Strings.EmphEvening</listEntry>
+                <listEntry value="4">@Strings.EmphFlat</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.morningStart" title="@Strings.SetMorningStart">
+            <settingConfig type="numeric" min="0" max="1439"/>
+        </setting>
+        <setting propertyKey="@Properties.dayStart" title="@Strings.SetDayStart">
+            <settingConfig type="numeric" min="0" max="1439"/>
+        </setting>
+        <setting propertyKey="@Properties.eveningStart" title="@Strings.SetEveningStart">
+            <settingConfig type="numeric" min="0" max="1439"/>
+        </setting>
+        <setting propertyKey="@Properties.accentColor" title="@Strings.SetAccentColor">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.AccentGold</listEntry>
+                <listEntry value="1">@Strings.AccentSteel</listEntry>
+                <listEntry value="2">@Strings.AccentJade</listEntry>
+                <listEntry value="3">@Strings.AccentEmber</listEntry>
+                <listEntry value="4">@Strings.AccentWhite</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.showSeconds" title="@Strings.SetShowSeconds">
+            <settingConfig type="boolean"/>
+        </setting>
+        <setting propertyKey="@Properties.showWeekday" title="@Strings.SetShowWeekday">
+            <settingConfig type="boolean"/>
+        </setting>
+        <setting propertyKey="@Properties.showTicks" title="@Strings.SetShowTicks">
+            <settingConfig type="boolean"/>
+        </setting>
+        <setting propertyKey="@Properties.stepGoalOverride" title="@Strings.SetStepGoalOverride">
+            <settingConfig type="numeric" min="0" max="100000"/>
+        </setting>
+        <setting propertyKey="@Properties.aodFields" title="@Strings.SetAodFields">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.AodTimeOnly</listEntry>
+                <listEntry value="1">@Strings.AodTimeBb</listEntry>
+                <listEntry value="2">@Strings.AodTimeBbSteps</listEntry>
+                <listEntry value="3">@Strings.AodTimeBattery</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.dateFormat" title="@Strings.SetDateFormat">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.DateDdMm</listEntry>
+                <listEntry value="1">@Strings.DateMmDd</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_hrv" title="@Strings.SetSlotHrv">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_bat" title="@Strings.SetSlotBat">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_bb" title="@Strings.SetSlotBb">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_rec" title="@Strings.SetSlotRec">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_cal" title="@Strings.SetSlotCal">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_sleep" title="@Strings.SetSlotSleep">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_hr" title="@Strings.SetSlotHr">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_int" title="@Strings.SetSlotInt">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_next" title="@Strings.SetSlotNext">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_sun" title="@Strings.SetSlotSun">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.field_steps" title="@Strings.SetSlotSteps">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.MetricHrv</listEntry>
+                <listEntry value="1">@Strings.MetricBattery</listEntry>
+                <listEntry value="2">@Strings.MetricBodyBattery</listEntry>
+                <listEntry value="3">@Strings.MetricRecovery</listEntry>
+                <listEntry value="4">@Strings.MetricCalories</listEntry>
+                <listEntry value="5">@Strings.MetricSleep</listEntry>
+                <listEntry value="6">@Strings.MetricHeartRate</listEntry>
+                <listEntry value="7">@Strings.MetricIntensity</listEntry>
+                <listEntry value="8">@Strings.MetricNextEvent</listEntry>
+                <listEntry value="9">@Strings.MetricSun</listEntry>
+                <listEntry value="10">@Strings.MetricSteps</listEntry>
+                <listEntry value="11">@Strings.MetricStress</listEntry>
+            </settingConfig>
+        </setting>
+    </settings>
+</resources>
