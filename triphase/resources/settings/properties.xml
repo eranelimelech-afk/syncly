@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <properties>
+        <property id="emphasisMode" type="number">0</property>
+        <property id="morningStart" type="number">240</property>
+        <property id="dayStart" type="number">510</property>
+        <property id="eveningStart" type="number">1200</property>
+        <property id="accentColor" type="number">0</property>
+        <property id="showSeconds" type="boolean">true</property>
+        <property id="showWeekday" type="boolean">true</property>
+        <property id="showTicks" type="boolean">true</property>
+        <property id="stepGoalOverride" type="number">0</property>
+        <property id="aodFields" type="number">1</property>
+        <property id="dateFormat" type="number">0</property>
+        <property id="field_hrv" type="number">0</property>
+        <property id="field_bat" type="number">1</property>
+        <property id="field_bb" type="number">2</property>
+        <property id="field_rec" type="number">3</property>
+        <property id="field_cal" type="number">4</property>
+        <property id="field_sleep" type="number">5</property>
+        <property id="field_hr" type="number">6</property>
+        <property id="field_int" type="number">7</property>
+        <property id="field_next" type="number">8</property>
+        <property id="field_sun" type="number">9</property>
+        <property id="field_steps" type="number">10</property>
+    </properties>
+</resources>

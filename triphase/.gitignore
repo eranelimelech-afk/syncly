@@ -1,0 +1,5 @@
+bin/
+gen/
+*.prg
+*.prg.debug.xml
+.DS_Store
