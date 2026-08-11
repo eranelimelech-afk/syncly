@@ -19,15 +19,15 @@ module Config {
     // Slot order is the canonical field order used everywhere:
     // hrv, bat, bb, rec, cal, sleep, hr, int, next, sun, steps
     // (module var, not const: Monkey C consts must be scalar literals)
-    var SLOT_KEYS = [
+    var SLOT_KEYS as Lang.Array<Lang.String> = [
         "field_hrv", "field_bat", "field_bb", "field_rec", "field_cal",
         "field_sleep", "field_hr", "field_int", "field_next", "field_sun",
         "field_steps"
     ];
 
-    var _cache = {};
+    var _cache as Lang.Dictionary = {};
 
-    function reload() {
+    function reload() as Void {
         _cache = {};
         $.Phase.invalidate();
     }

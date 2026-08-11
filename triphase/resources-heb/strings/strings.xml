@@ -1,15 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Hebrew overlay (spec section 10). Deliberately limited to phone-app setting
-  titles, which the Connect IQ mobile app renders correctly. On-watch labels
-  fall back to the English single-word tokens until a Hebrew bitmap font
+  Hebrew overlay (spec section 10). Phone-app setting titles are translated;
+  the Connect IQ mobile app renders Hebrew correctly. On-watch field labels
+  deliberately KEEP the English single-word tokens until a Hebrew bitmap font
   (27 letters + digits) is generated and validated on hardware - the simulator
   does not draw Hebrew glyphs, so a Hebrew watch layout cannot be verified
-  before sideloading. Every title is kept to a short phrase with no mixed
-  direction, since Monkey C performs no bidi reordering.
+  before sideloading. Every id from the English file is defined here (the
+  compiler warns on any id missing for a declared language). Titles are short
+  phrases with no mixed direction, since Monkey C performs no bidi reordering.
 -->
 <resources>
     <strings>
+        <string id="AppName">TriPhase</string>
+        <string id="WeekPrefix">· WEEK</string>
+
+        <!-- On-watch labels: English tokens on purpose (no Hebrew watch font yet) -->
+        <string id="LabelHrv">HRV</string>
+        <string id="LabelBattery">BAT</string>
+        <string id="LabelBodyBattery">BODY</string>
+        <string id="LabelRecovery">RECOV</string>
+        <string id="LabelCalories">CAL</string>
+        <string id="LabelSleep">SLEEP</string>
+        <string id="LabelHeartRate">HR</string>
+        <string id="LabelIntensity">INT</string>
+        <string id="LabelNextEvent">NEXT</string>
+        <string id="LabelSunrise">RISE</string>
+        <string id="LabelSunset">SET</string>
+        <string id="LabelSteps">STEPS</string>
+        <string id="LabelStress">STRESS</string>
+
+        <string id="AccentGold">זהב</string>
+        <string id="AccentSteel">פלדה</string>
+        <string id="AccentJade">ירקן</string>
+        <string id="AccentEmber">גחלת</string>
+        <string id="AccentWhite">לבן</string>
+
+        <string id="AodTimeOnly">שעה בלבד</string>
+        <string id="AodTimeBb">שעה + Body Battery</string>
+        <string id="AodTimeBbSteps">שעה + Body Battery + צעדים</string>
+        <string id="AodTimeBattery">שעה + סוללת השעון</string>
+
+        <string id="DateDdMm">DD.MM</string>
+        <string id="DateMmDd">MM.DD</string>
         <string id="SetEmphasisMode">מצב הדגשה</string>
         <string id="SetMorningStart">תחילת בוקר (דקות מחצות)</string>
         <string id="SetDayStart">תחילת יום (דקות מחצות)</string>

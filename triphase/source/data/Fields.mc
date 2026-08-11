@@ -34,13 +34,13 @@ module Fields {
 
     // Latest complication values, keyed by complication type constant.
     // Filled by TriPhaseApp.onComplicationChanged; read-only elsewhere.
-    var _complicationValues = {};
+    var _complicationValues as Lang.Dictionary = {};
     // Complication type constants resolved once (guarded by `has`), keyed by
     // a stable local symbol so accessors don't repeat the guards.
-    var _compTypes = {};
+    var _compTypes as Lang.Dictionary = {};
 
-    var _labels = null;
-    var _colors = null;
+    var _labels as Lang.Array? = null;
+    var _colors as Lang.Array? = null;
     var _sunsetLabel = null;
     var _weekPrefix = null;
 
@@ -122,7 +122,7 @@ module Fields {
 
     // Returns { :value, :label, :color, :frac } for a metric.
     // :frac is a 0..1 Float for arc-backed metrics, else null.
-    function get(metricId) {
+    function get(metricId as Lang.Number) as Lang.Dictionary {
         if (_labels == null) {
             _initStrings();
         }
@@ -181,7 +181,7 @@ module Fields {
         } else if (metricId == METRIC_NEXT_EVENT) {
             value = _nextEvent();
         } else if (metricId == METRIC_SUN) {
-            var sun = _sun();
+            var sun = _sun() as Lang.Array?;
             if (sun != null) {
                 value = sun[0];
                 label = sun[1];
@@ -261,15 +261,16 @@ module Fields {
         if (!(Toybox has :SensorHistory)) {
             return null;
         }
-        var sh = Toybox.SensorHistory;
         var it = null;
         if (historySymbol == :getBodyBatteryHistory) {
-            if (sh has :getBodyBatteryHistory) {
-                it = sh.getBodyBatteryHistory({:period => 1, :order => sh.ORDER_NEWEST_FIRST});
+            if (Toybox.SensorHistory has :getBodyBatteryHistory) {
+                it = Toybox.SensorHistory.getBodyBatteryHistory(
+                    {:period => 1, :order => Toybox.SensorHistory.ORDER_NEWEST_FIRST});
             }
         } else if (historySymbol == :getStressHistory) {
-            if (sh has :getStressHistory) {
-                it = sh.getStressHistory({:period => 1, :order => sh.ORDER_NEWEST_FIRST});
+            if (Toybox.SensorHistory has :getStressHistory) {
+                it = Toybox.SensorHistory.getStressHistory(
+                    {:period => 1, :order => Toybox.SensorHistory.ORDER_NEWEST_FIRST});
             }
         }
         if (it != null) {

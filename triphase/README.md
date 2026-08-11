@@ -18,10 +18,14 @@ monkeyc -o bin/TriPhase.prg -f monkey.jungle -y developer_key -d fenix847mm
 
 Run in the simulator with `connectiq` + `monkeydo bin/TriPhase.prg fenix847mm`.
 
-> **This tree has not yet been compiled against a real SDK** (authored in an
-> environment without the Connect IQ toolchain). Expect the first build to
-> surface small API-signature fixes. Everything below flagged "verify" is from
-> spec §13 and must be resolved during the first simulator/device spike.
+> **Build status:** compiles clean — `BUILD SUCCESSFUL`, 0 errors, 0 warnings
+> (`-w`) — against Connect IQ SDK 9.2.0 for all five declared products:
+> fenix8pro47mm, fenix843mm, fenix847mm, fenix8solar47mm, fenix8solar51mm.
+> The build environment had no Garmin developer login, so the device
+> definitions used were the schema-correct stubs in `tools/device-stubs/`
+> (real device ids and resolutions, fabricated part numbers/memory limits).
+> Rebuild with genuine SDK Manager device files before sideloading; simulator
+> and on-device testing remain outstanding.
 
 ## Project structure
 
@@ -49,9 +53,14 @@ changes.
 
 ## Deliberate deviations / open items (spec §13)
 
-1. **Product IDs** (`fenix8pro47mm` etc.) are taken from the spec verbatim and
-   **must be checked against the installed SDK's `devices.xml`** — a wrong id
-   means the face installs but never appears in the watch-face menu.
+1. **Product IDs — resolved.** Verified against SDK 9.2.0
+   (`resources/device-reference`): the spec's guessed `fenix8pro51mm` and
+   `fenix851mm` **do not exist**; the real family is `fenix843mm`,
+   `fenix847mm`, `fenix8pro47mm`, `fenix8solar47mm`, `fenix8solar51mm`, and
+   the manifest now declares exactly those. Re-check when a newer SDK adds a
+   Pro 51mm variant. Related fix found by the compiler: the manifest
+   permission for complications is `ComplicationSubscriber` — the spec's
+   `Complications` is not a valid permission id.
 2. **HRV status**: no documented watch-face API. The sanctioned §5 substitution
    is implemented — the HRV metric renders Stress from `SensorHistory` and is
    labeled STRESS on screen so it never misrepresents its source. If a future
@@ -75,16 +84,18 @@ changes.
    Add the on-device editor for accent + emphasis mode after verifying current
    fēnix 8 Pro firmware no longer shows the spurious "use system watch face"
    message.
-9. **Hebrew**: shipped as a phone-app-only overlay (setting titles). On-watch
-   Hebrew labels need a custom bitmap font and on-hardware validation — the
-   simulator does not render Hebrew at all (spec §10: "Ship English first").
+9. **Hebrew**: the overlay defines every string id (the compiler warns on ids
+   missing for a declared language). Phone-app setting titles are translated;
+   on-watch field labels deliberately keep the English tokens until a Hebrew
+   bitmap font is generated and validated on hardware — the simulator does not
+   render Hebrew at all (spec §10: "Ship English first").
 
 ## Acceptance status (spec §12)
 
 | # | Criterion | Status |
 |---|---|---|
-| 1 | Clean build, 4 products | pending first SDK build |
-| 2 | Appears in menu on device | pending device test (depends on product ids) |
+| 1 | Clean build, all declared products | **done** — 0 errors / 0 warnings, SDK 9.2.0, all 5 devices (via `tools/device-stubs/`) |
+| 2 | Appears in menu on device | pending device test (product ids verified against SDK) |
 | 3 | 11 live fields, `--` only when metric truly absent | implemented |
 | 4 | 5 emphasis modes incl. 20:00→04:00 wrap | implemented (`Phase._inWindow`) |
 | 5 | All 11 slots reassignable, survives restart | implemented (properties) |

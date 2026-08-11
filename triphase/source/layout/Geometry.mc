@@ -1,4 +1,5 @@
 using Toybox.Graphics;
+using Toybox.Lang;
 using Toybox.Math;
 
 // All layout coordinates live here (spec section 11: no magic numbers in the
@@ -39,7 +40,7 @@ module Geom {
     var tickOut;
     // Precomputed tick line endpoints: [x1, y1, x2, y2] * 60, computed once
     // in init so the draw loop does no trig (spec section 9).
-    var tickCoords = null;
+    var tickCoords as Lang.Array? = null;
 
     var wellR;
     var wellLeftX;
@@ -71,7 +72,7 @@ module Geom {
     // Slot descriptors, in Config.SLOT_KEYS order:
     // hrv, bat, bb, rec, cal, sleep, hr, int, next, sun, steps
     // Each: { :cx, :vy, :font, :lh (label y offset), :arc (:left/:right/:bottom/null) }
-    var slots = null;
+    var slots as Lang.Array<Lang.Dictionary>? = null;
 
     function px(v) {
         return (v * s + 0.5).toNumber();
@@ -143,20 +144,21 @@ module Geom {
         initialized = true;
     }
 
-    function _computeTicks() {
-        tickCoords = new [60];
+    function _computeTicks() as Void {
+        var coords = new [60];
         for (var i = 0; i < 60; i++) {
             var angle = (i * 6).toFloat() * Math.PI / 180.0;
             var cosA = Math.cos(angle);
             var sinA = Math.sin(angle);
             var isMajor = (i % 5) == 0;
             var rIn = isMajor ? tickMajorIn : tickMinorIn;
-            tickCoords[i] = [
+            coords[i] = [
                 (cx + rIn * cosA + 0.5).toNumber(),
                 (cy + rIn * sinA + 0.5).toNumber(),
                 (cx + tickOut * cosA + 0.5).toNumber(),
                 (cy + tickOut * sinA + 0.5).toNumber()
             ];
         }
+        tickCoords = coords;
     }
 }

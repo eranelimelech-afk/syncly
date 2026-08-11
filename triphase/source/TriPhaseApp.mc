@@ -23,7 +23,7 @@ class TriPhaseApp extends Application.AppBase {
         return [new TriPhaseView()];
     }
 
-    function onComplicationChanged(complicationId) {
+    function onComplicationChanged(complicationId as Toybox.Complications.Id) as Void {
         var c = Toybox.Complications.getComplication(complicationId);
         if (c != null) {
             $.Fields.storeComplication(c.getType(), c.value);

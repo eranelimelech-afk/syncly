@@ -1,0 +1,59 @@
+{
+  "deviceId": "fenix847mm",
+  "displayName": "fenix 8 47mm",
+  "deviceFamily": "round-454x454",
+  "worldWidePartNumber": "006-B4444-00",
+  "partNumbers": [
+    {
+      "number": "006-B4444-00",
+      "connectIQVersion": "5.1.0",
+      "firmwareVersion": 9999,
+      "languages": [
+        {
+          "code": "eng",
+          "fontSet": "ww"
+        },
+        {
+          "code": "heb",
+          "fontSet": "ww"
+        }
+      ]
+    }
+  ],
+  "resolution": {
+    "width": 454,
+    "height": 454
+  },
+  "bitsPerPixel": 16,
+  "appTypes": [
+    {
+      "type": "watchFace",
+      "memoryLimit": 1048576
+    },
+    {
+      "type": "watchApp",
+      "memoryLimit": 2097152
+    },
+    {
+      "type": "widget",
+      "memoryLimit": 1048576
+    },
+    {
+      "type": "datafield",
+      "memoryLimit": 262144
+    },
+    {
+      "type": "background",
+      "memoryLimit": 131072
+    },
+    {
+      "type": "glance",
+      "memoryLimit": 262144
+    }
+  ],
+  "launcherIcon": {
+    "width": 70,
+    "height": 70
+  },
+  "orientation": 0
+}

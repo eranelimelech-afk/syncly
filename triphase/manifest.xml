@@ -2,9 +2,11 @@
 <!--
   TriPhase watch face - Garmin fenix 8 / fenix 8 Pro.
 
-  NOTE (spec section 13): the product id strings below follow the build spec and
-  MUST be verified against the installed SDK's devices.xml before release.
-  fenix 8 and later silently hide a face whose device id is absent here.
+  Product ids verified against Connect IQ SDK 9.2.0 (resources/device-reference):
+  the spec's guessed "fenix8pro51mm" and "fenix851mm" do not exist in this SDK.
+  The real family is: fenix843mm, fenix847mm, fenix8pro47mm, fenix8solar47mm,
+  fenix8solar51mm. fenix 8 and later silently hide a face whose device id is
+  absent here, so re-verify when a new SDK adds Pro variants.
 -->
 <iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="3">
     <iq:application
@@ -16,12 +18,13 @@
         minApiLevel="5.0.0">
         <iq:products>
             <iq:product id="fenix8pro47mm"/>
-            <iq:product id="fenix8pro51mm"/>
+            <iq:product id="fenix843mm"/>
             <iq:product id="fenix847mm"/>
-            <iq:product id="fenix851mm"/>
+            <iq:product id="fenix8solar47mm"/>
+            <iq:product id="fenix8solar51mm"/>
         </iq:products>
         <iq:permissions>
-            <iq:uses-permission id="Complications"/>
+            <iq:uses-permission id="ComplicationSubscriber"/>
             <iq:uses-permission id="SensorHistory"/>
             <iq:uses-permission id="UserProfile"/>
         </iq:permissions>

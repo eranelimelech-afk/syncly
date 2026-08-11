@@ -28,14 +28,16 @@ module Palette {
 
     // Order must match the accentColor settings list: gold/steel/jade/ember/white.
     // (module var, not const: Monkey C consts must be scalar literals)
-    var ACCENTS = [GOLD, STEEL, JADE, EMBER, WHITE];
+    var ACCENTS as Toybox.Lang.Array<Toybox.Lang.Number> =
+        [GOLD, STEEL, JADE, EMBER, WHITE];
 }
 
 // Every pixel drawn by the face goes through this module. Exactly one place
 // (drawField) decides lit vs. unlit colors (spec section 6).
 module Painter {
 
-    var WEEKDAY_TOKENS = ["S", "M", "T", "W", "T", "F", "S"];
+    var WEEKDAY_TOKENS as Lang.Array<Lang.String> =
+        ["S", "M", "T", "W", "T", "F", "S"];
 
     function drawFace(dc, lowPower, burnIn) {
         var phase = Phase.resolve();
@@ -69,12 +71,13 @@ module Painter {
         }
 
         var aodMode = Config.aodFields();
-        for (var i = 0; i < Geom.slots.size(); i++) {
+        var slots = Geom.slots as Lang.Array<Lang.Dictionary>;
+        for (var i = 0; i < slots.size(); i++) {
             var metricId = Config.slotMetric(i);
             if (lowPower && !_aodAllows(aodMode, metricId)) {
                 continue;
             }
-            var slot = Geom.slots[i];
+            var slot = slots[i];
             var d = Fields.get(metricId);
             var lit = Phase.isLit(metricId, phase);
             _drawField(dc, slot, d, lit, lowPower, offsetY);
@@ -112,8 +115,9 @@ module Painter {
     }
 
     function _drawTicks(dc, accent) {
+        var coords = Geom.tickCoords as Lang.Array;
         for (var i = 0; i < 60; i++) {
-            var t = Geom.tickCoords[i];
+            var t = coords[i] as Lang.Array<Lang.Number>;
             if (i % 15 == 0) {
                 // Quarter ticks (12/3/6/9) carry the accent color.
                 dc.setColor(accent, Graphics.COLOR_TRANSPARENT);
@@ -207,7 +211,8 @@ module Painter {
     // The single place that decides lit vs. unlit colors (spec section 6).
     // Color rule (spec section 4): the label carries its category color only
     // when the field is lit; unlit, both value and label go gray.
-    function _drawField(dc, slot, d, lit, lowPower, offsetY) {
+    function _drawField(dc, slot as Lang.Dictionary, d as Lang.Dictionary,
+            lit, lowPower, offsetY) {
         var vColor;
         var lColor;
         if (lit) {
