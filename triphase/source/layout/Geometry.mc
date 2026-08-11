@@ -16,69 +16,69 @@ module Geom {
 
     const REF = 454.0;
 
-    var initialized = false;
+    var initialized as Lang.Boolean = false;
 
-    var w = 454;
-    var h = 454;
-    var cx = 227;
-    var cy = 227;
-    var s = 1.0;
+    var w as Lang.Number = 454;
+    var h as Lang.Number = 454;
+    var cx as Lang.Number = 227;
+    var cy as Lang.Number = 227;
+    var s as Lang.Float = 1.0;
 
     // Fonts by role
-    var fontTime;
-    var fontSeconds;
-    var fontValueL;   // ~32px: steps
-    var fontValueM;   // ~28-29px: calories, sub-dials
-    var fontValueS;   // ~21-22px: everything else
-    var fontLabel;    // ~11px labels
-    var fontDate;
-    var fontWeekday;
+    var fontTime as Graphics.FontDefinition = Graphics.FONT_NUMBER_THAI_HOT;
+    var fontSeconds as Graphics.FontDefinition = Graphics.FONT_TINY;
+    var fontValueL as Graphics.FontDefinition = Graphics.FONT_MEDIUM;  // ~32px: steps
+    var fontValueM as Graphics.FontDefinition = Graphics.FONT_SMALL;   // ~28-29px: calories, sub-dials
+    var fontValueS as Graphics.FontDefinition = Graphics.FONT_TINY;    // ~21-22px: everything else
+    var fontLabel as Graphics.FontDefinition = Graphics.FONT_XTINY;    // labels
+    var fontDate as Graphics.FontDefinition = Graphics.FONT_XTINY;
+    var fontWeekday as Graphics.FontDefinition = Graphics.FONT_XTINY;
 
     // Chrome geometry
-    var tickMinorIn;
-    var tickMajorIn;
-    var tickOut;
+    var tickMinorIn as Lang.Number = 0;
+    var tickMajorIn as Lang.Number = 0;
+    var tickOut as Lang.Number = 0;
     // Precomputed tick line endpoints: [x1, y1, x2, y2] * 60, computed once
     // in init so the draw loop does no trig (spec section 9).
     var tickCoords as Lang.Array? = null;
 
-    var wellR;
-    var wellLeftX;
-    var wellRightX;
-    var wellY;
-    var subArcR;
-    var subArcW;
+    var wellR as Lang.Number = 0;
+    var wellLeftX as Lang.Number = 0;
+    var wellRightX as Lang.Number = 0;
+    var wellY as Lang.Number = 0;
+    var subArcR as Lang.Number = 0;
+    var subArcW as Lang.Number = 2;
 
-    var bottomArcR;
-    var bottomArcW;
+    var bottomArcR as Lang.Number = 0;
+    var bottomArcW as Lang.Number = 3;
 
     // Text anchor rows (y = top of text block, x = center of block)
-    var dateY;
-    var weekdayY;
-    var weekdayStep;
-    var timeY;
-    var secondsX;
-    var secondsY;
+    var dateY as Lang.Number = 0;
+    var weekdayY as Lang.Number = 0;
+    var weekdayStep as Lang.Number = 0;
+    var timeY as Lang.Number = 0;
+    var secondsX as Lang.Number = 0;
+    var secondsY as Lang.Number = 0;
 
     // Seconds clip region for onPartialUpdate
-    var secClipX;
-    var secClipY;
-    var secClipW;
-    var secClipH;
+    var secClipX as Lang.Number = 0;
+    var secClipY as Lang.Number = 0;
+    var secClipW as Lang.Number = 0;
+    var secClipH as Lang.Number = 0;
 
     // Burn-in shift amplitude
-    var burnShift;
+    var burnShift as Lang.Number = 1;
 
     // Slot descriptors, in Config.SLOT_KEYS order:
     // hrv, bat, bb, rec, cal, sleep, hr, int, next, sun, steps
     // Each: { :cx, :vy, :font, :lh (label y offset), :arc (:left/:right/:bottom/null) }
     var slots as Lang.Array<Lang.Dictionary>? = null;
 
-    function px(v) {
+    function px(v as Lang.Number) as Lang.Number {
         return (v * s + 0.5).toNumber();
     }
 
-    function init(dc) {
+    function init(dc as Graphics.Dc) as Void {
         w = dc.getWidth();
         h = dc.getHeight();
         cx = w / 2;

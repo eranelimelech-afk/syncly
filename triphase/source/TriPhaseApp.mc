@@ -1,4 +1,5 @@
 using Toybox.Application;
+using Toybox.Lang;
 using Toybox.WatchUi;
 
 // App entry point. Owns the complication subscriptions (spec section 5:
@@ -9,14 +10,14 @@ class TriPhaseApp extends Application.AppBase {
         AppBase.initialize();
     }
 
-    function onStart(state) {
+    function onStart(state as Lang.Dictionary?) as Void {
         if (Toybox has :Complications) {
             Toybox.Complications.registerComplicationChangeCallback(method(:onComplicationChanged));
             $.Fields.subscribeComplications();
         }
     }
 
-    function onStop(state) {
+    function onStop(state as Lang.Dictionary?) as Void {
     }
 
     function getInitialView() {
@@ -26,11 +27,14 @@ class TriPhaseApp extends Application.AppBase {
     function onComplicationChanged(complicationId as Toybox.Complications.Id) as Void {
         var c = Toybox.Complications.getComplication(complicationId);
         if (c != null) {
-            $.Fields.storeComplication(c.getType(), c.value);
+            var type = c.getType();
+            if (type != null) {
+                $.Fields.storeComplication(type, c.value);
+            }
         }
     }
 
-    function onSettingsChanged() {
+    function onSettingsChanged() as Void {
         $.Config.reload();
         WatchUi.requestUpdate();
     }

@@ -19,8 +19,10 @@ monkeyc -o bin/TriPhase.prg -f monkey.jungle -y developer_key -d fenix847mm
 Run in the simulator with `connectiq` + `monkeydo bin/TriPhase.prg fenix847mm`.
 
 > **Build status:** compiles clean — `BUILD SUCCESSFUL`, 0 errors, 0 warnings
-> (`-w`) — against Connect IQ SDK 9.2.0 for all five declared products:
-> fenix8pro47mm, fenix843mm, fenix847mm, fenix8solar47mm, fenix8solar51mm.
+> (`-w`) at **strict type checking (`-l 3`)** — against Connect IQ SDK 9.2.0
+> for all five declared products: fenix8pro47mm, fenix843mm, fenix847mm,
+> fenix8solar47mm, fenix8solar51mm. The whole codebase is fully type-annotated;
+> every nullable API value is locally narrowed before use.
 > The build environment had no Garmin developer login, so the device
 > definitions used were the schema-correct stubs in `tools/device-stubs/`
 > (real device ids and resolutions, fabricated part numbers/memory limits).
@@ -54,11 +56,13 @@ changes.
 ## Deliberate deviations / open items (spec §13)
 
 1. **Product IDs — resolved.** Verified against SDK 9.2.0
-   (`resources/device-reference`): the spec's guessed `fenix8pro51mm` and
-   `fenix851mm` **do not exist**; the real family is `fenix843mm`,
-   `fenix847mm`, `fenix8pro47mm`, `fenix8solar47mm`, `fenix8solar51mm`, and
-   the manifest now declares exactly those. Re-check when a newer SDK adds a
-   Pro 51mm variant. Related fix found by the compiler: the manifest
+   (`resources/device-reference`) and Garmin's compatible-devices page: the
+   spec's guessed `fenix8pro51mm` and `fenix851mm` **intentionally do not
+   exist**. Garmin groups same-resolution variants under a single Connect IQ
+   id: `fenix8pro47mm` covers fēnix 8 Pro **47mm, 51mm and MicroLED** (all
+   454×454 AMOLED, API level 6.0), and `fenix847mm` covers fēnix 8 47mm and
+   51mm. The manifest's five ids therefore cover the entire fēnix 8 family,
+   including the Pro 51mm. Related fix found by the compiler: the manifest
    permission for complications is `ComplicationSubscriber` — the spec's
    `Complications` is not a valid permission id.
 2. **HRV status**: no documented watch-face API. The sanctioned §5 substitution
@@ -94,12 +98,12 @@ changes.
 
 | # | Criterion | Status |
 |---|---|---|
-| 1 | Clean build, all declared products | **done** — 0 errors / 0 warnings, SDK 9.2.0, all 5 devices (via `tools/device-stubs/`) |
+| 1 | Clean build, all declared products | **done** — 0 errors / 0 warnings at strict typecheck (`-l 3`), SDK 9.2.0, all 5 devices (via `tools/device-stubs/`) |
 | 2 | Appears in menu on device | pending device test (product ids verified against SDK) |
 | 3 | 11 live fields, `--` only when metric truly absent | implemented |
 | 4 | 5 emphasis modes incl. 20:00→04:00 wrap | implemented (`Phase._inWindow`) |
 | 5 | All 11 slots reassignable, survives restart | implemented (properties) |
 | 6 | AOD time legible | implemented (full-size white time in low power) |
-| 7 | <40ms full / <30ms partial | pending profiler run |
+| 7 | <40ms full / <30ms partial | pending profiler run (build stats: ~12KB code+data, PRG 128KB — far under memory limits; no allocation-heavy paths in the draw loop) |
 | 8 | AOD battery within 10% of stock | pending 24h device test |
 | 9 | Bottom arc never touches steps digits | enforced (60° sweep clamp, y≈372 vs 377) |

@@ -1,7 +1,7 @@
 using Toybox.Graphics;
+using Toybox.Lang;
 using Toybox.System;
 using Toybox.WatchUi;
-using Toybox.Lang;
 
 // Visual system (spec section 4).
 module Palette {
@@ -39,7 +39,8 @@ module Painter {
     var WEEKDAY_TOKENS as Lang.Array<Lang.String> =
         ["S", "M", "T", "W", "T", "F", "S"];
 
-    function drawFace(dc, lowPower, burnIn) {
+    function drawFace(dc as Graphics.Dc, lowPower as Lang.Boolean,
+            burnIn as Lang.Boolean) as Void {
         var phase = Phase.resolve();
         var accent = Palette.ACCENTS[Config.accentColor()];
 
@@ -65,7 +66,7 @@ module Painter {
             }
         }
 
-        _drawTime(dc, offsetY, lowPower);
+        _drawTime(dc, offsetY);
         if (!lowPower && Config.showSeconds()) {
             drawSeconds(dc, accent);
         }
@@ -81,14 +82,16 @@ module Painter {
             var d = Fields.get(metricId);
             var lit = Phase.isLit(metricId, phase);
             _drawField(dc, slot, d, lit, lowPower, offsetY);
-            if (slot[:arc] != null && d[:frac] != null) {
-                _drawSlotArc(dc, slot[:arc], d[:frac],
-                    lit ? d[:color] : Palette.DIM_VALUE, lowPower, offsetY);
+            var arc = slot[:arc];
+            var frac = d[:frac];
+            if (arc instanceof Lang.Symbol && frac instanceof Lang.Float) {
+                var color = lit ? d[:color] as Lang.Number : Palette.DIM_VALUE;
+                _drawSlotArc(dc, arc, frac, color, lowPower, offsetY);
             }
         }
     }
 
-    function _aodAllows(aodMode, metricId) {
+    function _aodAllows(aodMode as Lang.Number, metricId as Lang.Number) as Lang.Boolean {
         if (aodMode == Config.AOD_TIME_BB) {
             return metricId == Fields.METRIC_BODY_BATTERY;
         }
@@ -107,14 +110,14 @@ module Painter {
     // The spec's radial gradient + carbon cross-hatch, approximated with two
     // concentric fills. A full-screen texture bitmap is explicitly banned by
     // the performance budget (spec section 9).
-    function _drawBackgroundGlow(dc) {
+    function _drawBackgroundGlow(dc as Graphics.Dc) as Void {
         dc.setColor(Palette.BG_MID, Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(Geom.cx, Geom.cy, Geom.px(150));
         dc.setColor(Palette.BG_CENTER, Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(Geom.cx, Geom.cy, Geom.px(95));
     }
 
-    function _drawTicks(dc, accent) {
+    function _drawTicks(dc as Graphics.Dc, accent as Lang.Number) as Void {
         var coords = Geom.tickCoords as Lang.Array;
         for (var i = 0; i < 60; i++) {
             var t = coords[i] as Lang.Array<Lang.Number>;
@@ -131,7 +134,7 @@ module Painter {
         dc.setPenWidth(1);
     }
 
-    function _drawWells(dc) {
+    function _drawWells(dc as Graphics.Dc) as Void {
         dc.setColor(Palette.WELL, Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(Geom.wellLeftX, Geom.wellY, Geom.wellR);
         dc.fillCircle(Geom.wellRightX, Geom.wellY, Geom.wellR);
@@ -143,13 +146,13 @@ module Painter {
 
     // --- header --------------------------------------------------------
 
-    function _drawDate(dc) {
+    function _drawDate(dc as Graphics.Dc) as Void {
         dc.setColor(Palette.DIM_VALUE, Graphics.COLOR_TRANSPARENT);
         dc.drawText(Geom.cx, Geom.dateY, Geom.fontDate, Fields.dateString(),
             Graphics.TEXT_JUSTIFY_CENTER);
     }
 
-    function _drawWeekday(dc, accent) {
+    function _drawWeekday(dc as Graphics.Dc, accent as Lang.Number) as Void {
         var today = Fields.dayOfWeek(); // 1 = Sunday
         var totalW = Geom.weekdayStep * 7;
         var x = Geom.cx - totalW / 2 + Geom.weekdayStep / 2;
@@ -175,7 +178,7 @@ module Painter {
 
     // The time is never compromised (spec section 14): full size, full white,
     // in both power modes.
-    function _drawTime(dc, offsetY, lowPower) {
+    function _drawTime(dc as Graphics.Dc, offsetY as Lang.Number) as Void {
         var clock = System.getClockTime();
         var hour = clock.hour;
         if (!System.getDeviceSettings().is24Hour) {
@@ -190,7 +193,7 @@ module Painter {
             Graphics.TEXT_JUSTIFY_CENTER);
     }
 
-    function drawSeconds(dc, accent) {
+    function drawSeconds(dc as Graphics.Dc, accent as Lang.Number) as Void {
         dc.setColor(accent, Graphics.COLOR_TRANSPARENT);
         dc.drawText(Geom.secondsX, Geom.secondsY, Geom.fontSeconds,
             System.getClockTime().sec.format("%02d"), Graphics.TEXT_JUSTIFY_LEFT);
@@ -198,7 +201,7 @@ module Painter {
 
     // Clipped seconds redraw for onPartialUpdate (spec section 8: only ever
     // the seconds region, nothing more).
-    function drawSecondsPartial(dc) {
+    function drawSecondsPartial(dc as Graphics.Dc) as Void {
         dc.setClip(Geom.secClipX, Geom.secClipY, Geom.secClipW, Geom.secClipH);
         dc.setColor(Palette.INK, Palette.INK);
         dc.fillRectangle(Geom.secClipX, Geom.secClipY, Geom.secClipW, Geom.secClipH);
@@ -211,13 +214,14 @@ module Painter {
     // The single place that decides lit vs. unlit colors (spec section 6).
     // Color rule (spec section 4): the label carries its category color only
     // when the field is lit; unlit, both value and label go gray.
-    function _drawField(dc, slot as Lang.Dictionary, d as Lang.Dictionary,
-            lit, lowPower, offsetY) {
+    function _drawField(dc as Graphics.Dc, slot as Lang.Dictionary,
+            d as Lang.Dictionary, lit as Lang.Boolean, lowPower as Lang.Boolean,
+            offsetY as Lang.Number) as Void {
         var vColor;
         var lColor;
         if (lit) {
             vColor = Palette.WHITE;
-            lColor = d[:color];
+            lColor = d[:color] as Lang.Number;
         } else if (lowPower) {
             vColor = Palette.LP_VALUE;
             lColor = Palette.LP_LABEL;
@@ -225,18 +229,22 @@ module Painter {
             vColor = Palette.DIM_VALUE;
             lColor = Palette.DIM_LABEL;
         }
-        var x = slot[:cx];
-        var vy = slot[:vy] + offsetY;
+        var x = slot[:cx] as Lang.Number;
+        var vy = (slot[:vy] as Lang.Number) + offsetY;
+        var font = slot[:font] as Graphics.FontDefinition;
         dc.setColor(vColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x, vy, slot[:font], d[:value], Graphics.TEXT_JUSTIFY_CENTER);
-        dc.setColor(lColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x, vy + slot[:lh], Geom.fontLabel, d[:label],
+        dc.drawText(x, vy, font, d[:value] as Lang.String,
             Graphics.TEXT_JUSTIFY_CENTER);
+        dc.setColor(lColor, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, vy + (slot[:lh] as Lang.Number), Geom.fontLabel,
+            d[:label] as Lang.String, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     // --- arcs ----------------------------------------------------------
 
-    function _drawSlotArc(dc, which, frac, color, lowPower, offsetY) {
+    function _drawSlotArc(dc as Graphics.Dc, which as Lang.Symbol,
+            frac as Lang.Float, color as Lang.Number, lowPower as Lang.Boolean,
+            offsetY as Lang.Number) as Void {
         var track = lowPower ? Palette.LP_TRACK : Palette.TRACK;
         if (which == :left) {
             _drawRingArc(dc, Geom.wellLeftX, Geom.wellY + offsetY, Geom.subArcR,
@@ -251,7 +259,9 @@ module Painter {
 
     // Full-circle gauge starting at 12 o'clock, filling clockwise.
     // Garmin arc angles: 0 at 3 o'clock, increasing counterclockwise.
-    function _drawRingArc(dc, x, y, r, penW, frac, color, trackColor) {
+    function _drawRingArc(dc as Graphics.Dc, x as Lang.Number, y as Lang.Number,
+            r as Lang.Number, penW as Lang.Number, frac as Lang.Float,
+            color as Lang.Number, trackColor as Lang.Number) as Void {
         dc.setPenWidth(penW);
         dc.setColor(trackColor, Graphics.COLOR_TRANSPARENT);
         dc.drawArc(x, y, r, Graphics.ARC_CLOCKWISE, 90, 270);
@@ -273,16 +283,20 @@ module Painter {
     // filling viewer-left to viewer-right. Its lowest point is cy + r; the
     // sweep must never extend past 60 degrees or it collides with the steps
     // digits below it (spec section 3.3).
-    function _drawBottomArc(dc, frac, color, trackColor, offsetY) {
+    function _drawBottomArc(dc as Graphics.Dc, frac as Lang.Float,
+            color as Lang.Number, trackColor as Lang.Number,
+            offsetY as Lang.Number) as Void {
         var y = Geom.cy + offsetY;
         dc.setPenWidth(Geom.bottomArcW);
         dc.setColor(trackColor, Graphics.COLOR_TRANSPARENT);
         dc.drawArc(Geom.cx, y, Geom.bottomArcR, Graphics.ARC_COUNTER_CLOCKWISE, 240, 300);
-        if (frac > 0.01) {
-            var endDeg = 240 + (60.0 * frac).toNumber();
-            if (endDeg > 300) {
-                endDeg = 300;
-            }
+        var endDeg = 240 + (60.0 * frac).toNumber();
+        if (endDeg > 300) {
+            endDeg = 300;
+        }
+        // endDeg must strictly exceed the start angle: drawArc with equal
+        // angles is degenerate and can render a full circle on some firmware.
+        if (endDeg > 240) {
             dc.setColor(color, Graphics.COLOR_TRANSPARENT);
             dc.drawArc(Geom.cx, y, Geom.bottomArcR, Graphics.ARC_COUNTER_CLOCKWISE, 240, endDeg);
         }
