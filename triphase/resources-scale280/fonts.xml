@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <fonts>
+        <font id="time82" filename="fonts/time82.fnt" antialias="true"/>
+        <font id="sec22" filename="fonts/sec22.fnt" antialias="true"/>
+        <font id="val32" filename="fonts/val32.fnt" antialias="true"/>
+        <font id="val29" filename="fonts/val29.fnt" antialias="true"/>
+        <font id="val28" filename="fonts/val28.fnt" antialias="true"/>
+        <font id="val22" filename="fonts/val22.fnt" antialias="true"/>
+        <font id="val21" filename="fonts/val21.fnt" antialias="true"/>
+        <font id="label11" filename="fonts/label11.fnt" antialias="true"/>
+        <font id="date16" filename="fonts/date16.fnt" antialias="true"/>
+        <font id="week12" filename="fonts/week12.fnt" antialias="true"/>
+    </fonts>
+</resources>

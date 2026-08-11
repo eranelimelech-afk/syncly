@@ -165,7 +165,8 @@ module Painter {
 
     function _drawDate(dc as Graphics.Dc) as Void {
         dc.setColor(Palette.DIM_VALUE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(Geom.cx, Geom.dateY, Geom.fontDate, Fields.dateString(),
+        dc.drawText(Geom.cx, Geom.dateY, Geom.fontDate as WatchUi.FontResource,
+            Fields.dateString(),
             Graphics.TEXT_JUSTIFY_CENTER);
     }
 
@@ -173,7 +174,8 @@ module Painter {
         var today = Fields.dayOfWeek(); // 1 = Sunday
         var totalW = Geom.weekdayStep * 7;
         var x = Geom.cx - totalW / 2 + Geom.weekdayStep / 2;
-        var fh = dc.getFontHeight(Geom.fontWeekday);
+        var fontWeekday = Geom.fontWeekday as WatchUi.FontResource;
+        var fh = dc.getFontHeight(fontWeekday);
         for (var i = 0; i < 7; i++) {
             if (i == today - 1) {
                 // Current day inverted on an accent pill.
@@ -185,7 +187,7 @@ module Painter {
             } else {
                 dc.setColor(Palette.DIM_LABEL, Graphics.COLOR_TRANSPARENT);
             }
-            dc.drawText(x, Geom.weekdayY, Geom.fontWeekday, WEEKDAY_TOKENS[i],
+            dc.drawText(x, Geom.weekdayY, fontWeekday, WEEKDAY_TOKENS[i],
                 Graphics.TEXT_JUSTIFY_CENTER);
             x += Geom.weekdayStep;
         }
@@ -206,13 +208,15 @@ module Painter {
         }
         var text = hour.format("%02d") + ":" + clock.min.format("%02d");
         dc.setColor(Palette.WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(Geom.cx, Geom.timeY + offsetY, Geom.fontTime, text,
+        dc.drawText(Geom.cx, Geom.timeY + offsetY,
+            Geom.fontTime as WatchUi.FontResource, text,
             Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     function drawSeconds(dc as Graphics.Dc, accent as Lang.Number) as Void {
         dc.setColor(accent, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(Geom.secondsX, Geom.secondsY, Geom.fontSeconds,
+        dc.drawText(Geom.secondsX, Geom.secondsY,
+            Geom.fontSeconds as WatchUi.FontResource,
             System.getClockTime().sec.format("%02d"), Graphics.TEXT_JUSTIFY_LEFT);
     }
 
@@ -248,12 +252,13 @@ module Painter {
         }
         var x = slot[:cx] as Lang.Number;
         var vy = (slot[:vy] as Lang.Number) + offsetY;
-        var font = slot[:font] as Graphics.FontDefinition;
+        var font = slot[:font] as WatchUi.FontResource;
         dc.setColor(vColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(x, vy, font, d[:value] as Lang.String,
             Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(lColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x, vy + (slot[:lh] as Lang.Number), Geom.fontLabel,
+        dc.drawText(x, vy + (slot[:lh] as Lang.Number),
+            Geom.fontLabel as WatchUi.FontResource,
             d[:label] as Lang.String, Graphics.TEXT_JUSTIFY_CENTER);
     }
 

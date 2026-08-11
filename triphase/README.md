@@ -82,11 +82,17 @@ changes.
    this check on each new SDK release; a guarded reference cannot be added
    preemptively because Monkey C requires the symbol to exist at compile time.
 3. **Training readiness**: dropped (not exposed), per spec.
-4. **Fonts**: currently the nearest built-in fonts. The spec's custom bitmap
-   fonts (Barlow Semi Condensed, tabular figures, per-size `.fnt` filtered to
-   needed glyphs) are the next step; each slot descriptor in `Geometry.mc`
-   carries its font, so swapping is one line per size. Re-check the §3 vertical
-   ladder once real font metrics are known.
+4. **Fonts — resolved.** The spec's custom bitmap fonts are implemented:
+   Barlow Semi Condensed (Medium/SemiBold), one BMFont `.fnt` + PNG atlas per
+   size, filtered to only the glyphs each role needs, with **forced tabular
+   figures** (every digit advances by the widest digit's advance) so the time
+   never jitters. `tools/gen_fonts.py` generates a scaled set per resolution
+   (`resources-scale454/416/280/260`), selected via `monkey.jungle`. This
+   fixed the on-device overlap seen with built-in fonts (which are 1.5-2x
+   taller than the spec sizes): the §3 ladder is now verified numerically
+   against the real generated metrics — every row clears the next, the side
+   fields clear the time digits, and the bottom arc's outer edge (y=376)
+   stays above the steps text (y=377).
 5. **Next event**: no native API. Falls back to the calendar-events
    complication where the device offers it, else `--`. The spec's
    companion-app channel is out of scope for this pass.
