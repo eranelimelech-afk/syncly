@@ -28,17 +28,20 @@ LOWER = "abcdefghijklmnopqrstuvwxyz"
 NUMERIC_EXTRA = "%h:-.,/ "
 TEXT_SET = DIGITS + UPPER + LOWER + NUMERIC_EXTRA + "·+&'"
 
-# (id, spec_px_size, weight, charset, extra letter spacing px at 454)
+# (id, px_size at 454, weight, charset, extra letter spacing px at 454)
+# Sizes were bumped from the spec's originals after on-device review found
+# them too small at arm's length (spec section 14 rule 1: legibility at a
+# glance beats density).
 FONTS = [
     ("time82",   82, 600, DIGITS + ":",             0),
-    ("sec22",    22, 500, DIGITS,                   0),
-    ("val32",    32, 600, DIGITS + NUMERIC_EXTRA,   0),
-    ("val29",    29, 600, DIGITS + NUMERIC_EXTRA,   0),
-    ("val28",    28, 600, DIGITS + NUMERIC_EXTRA,   0),
-    ("val22",    22, 500, TEXT_SET,                 0),
-    ("val21",    21, 500, TEXT_SET,                 0),
-    ("label11",  12, 600, DIGITS + UPPER + " /·",   2),
-    ("date16",   16, 500, DIGITS + UPPER + " .·",   1),
+    ("sec22",    24, 500, DIGITS,                   0),
+    ("val32",    34, 600, DIGITS + NUMERIC_EXTRA,   0),
+    ("val29",    30, 600, DIGITS + NUMERIC_EXTRA,   0),
+    ("val28",    30, 600, DIGITS + NUMERIC_EXTRA,   0),
+    ("val22",    24, 500, TEXT_SET,                 0),
+    ("val21",    24, 500, TEXT_SET,                 0),
+    ("label11",  13, 600, DIGITS + UPPER + " /·",   2),
+    ("date16",   17, 500, DIGITS + UPPER + " .·",   1),
     ("week12",   13, 600, UPPER,                    0),
 ]
 

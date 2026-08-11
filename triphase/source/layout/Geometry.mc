@@ -118,7 +118,7 @@ module Geom {
         weekdayY = px(62);
         weekdayStep = px(27);
         timeY = px(127);
-        secondsX = px(337);
+        secondsX = px(339);
         secondsY = px(132);
 
         secClipX = px(330);
@@ -134,20 +134,26 @@ module Geom {
         var lhM = dc.getFontHeight(fontValueM as WatchUi.FontResource);
         var lhL = dc.getFontHeight(fontValueL as WatchUi.FontResource);
 
-        // Spec section 3.2 ladder (454 canvas). With the custom fonts' tight
-        // metrics every block clears the next row; the bottom arc's outer
-        // edge (y=376) stays above the steps text top (y=377).
+        // Revised ladder (v2, after on-device review on fenix 8 Pro).
+        // The spec's int/next/sun row at y=309 sat inside the sub-dial
+        // circles and collided with the BODY/RECOV arcs and text, so the
+        // middle band is restructured: int+sleep+hr+sun share one 4-field
+        // row above the wells, and next sits alone between the wells.
+        // Every block was re-verified numerically against the generated
+        // font metrics: rows clear each other, the row-4 fields clear the
+        // sub-dial arc rings (which need |y-342| <= 42), and the bottom
+        // arc's outer edge (y=376) stays above the steps text top (y=377).
         slots = [
-            { :cx => px(94),  :vy => px(98),  :font => fontValueS,  :lh => lhS,   :arc => null },     // hrv
-            { :cx => px(360), :vy => px(98),  :font => fontValueS,  :lh => lhS,   :arc => null },     // bat
-            { :cx => px(115), :vy => px(318), :font => fontValueSub, :lh => lhSub, :arc => :left },   // bb
-            { :cx => px(339), :vy => px(318), :font => fontValueSub, :lh => lhSub, :arc => :right },  // rec
-            { :cx => px(227), :vy => px(219), :font => fontValueM,  :lh => lhM,   :arc => null },     // cal
-            { :cx => px(186), :vy => px(267), :font => fontValueS,  :lh => lhS,   :arc => null },     // sleep
-            { :cx => px(268), :vy => px(267), :font => fontValueS,  :lh => lhS,   :arc => null },     // hr
-            { :cx => px(145), :vy => px(309), :font => fontValueXS, :lh => lhXS,  :arc => null },     // int
-            { :cx => px(227), :vy => px(309), :font => fontValueXS, :lh => lhXS,  :arc => null },     // next
-            { :cx => px(309), :vy => px(309), :font => fontValueXS, :lh => lhXS,  :arc => null },     // sun
+            { :cx => px(94),  :vy => px(96),  :font => fontValueS,  :lh => lhS,   :arc => null },     // hrv
+            { :cx => px(360), :vy => px(96),  :font => fontValueS,  :lh => lhS,   :arc => null },     // bat
+            { :cx => px(115), :vy => px(320), :font => fontValueSub, :lh => lhSub, :arc => :left },   // bb
+            { :cx => px(339), :vy => px(320), :font => fontValueSub, :lh => lhSub, :arc => :right },  // rec
+            { :cx => px(227), :vy => px(213), :font => fontValueM,  :lh => lhM,   :arc => null },     // cal
+            { :cx => px(186), :vy => px(257), :font => fontValueS,  :lh => lhS,   :arc => null },     // sleep
+            { :cx => px(268), :vy => px(257), :font => fontValueS,  :lh => lhS,   :arc => null },     // hr
+            { :cx => px(105), :vy => px(257), :font => fontValueXS, :lh => lhXS,  :arc => null },     // int
+            { :cx => px(227), :vy => px(305), :font => fontValueXS, :lh => lhXS,  :arc => null },     // next
+            { :cx => px(349), :vy => px(257), :font => fontValueXS, :lh => lhXS,  :arc => null },     // sun
             { :cx => px(227), :vy => px(377), :font => fontValueL,  :lh => lhL,   :arc => :bottom }   // steps
         ];
 
