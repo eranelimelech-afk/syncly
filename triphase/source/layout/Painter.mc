@@ -57,7 +57,16 @@ module Painter {
         if (!lowPower) {
             _drawBackgroundGlow(dc);
             if (Config.showTicks()) {
-                _drawTicks(dc, accent);
+                // The tick matching the current second lights up in the
+                // accent color (same color as the seconds counter); all
+                // other ticks keep their regular unlit color. Tick index 0
+                // sits at 3 o'clock and indices advance clockwise, so
+                // second s (0 = 12 o'clock) maps to tick (s + 45) % 60.
+                var secTick = -1;
+                if (Config.showSeconds()) {
+                    secTick = (System.getClockTime().sec + 45) % 60;
+                }
+                _drawTicks(dc, accent, secTick);
             }
             _drawWells(dc);
             _drawDate(dc);
@@ -117,11 +126,19 @@ module Painter {
         dc.fillCircle(Geom.cx, Geom.cy, Geom.px(95));
     }
 
-    function _drawTicks(dc as Graphics.Dc, accent as Lang.Number) as Void {
+    // secondTick: index of the tick lit for the current second (-1 = none).
+    // It renders wider than a quarter tick so it reads as lit even when it
+    // lands on an already-accented quarter position.
+    function _drawTicks(dc as Graphics.Dc, accent as Lang.Number,
+            secondTick as Lang.Number) as Void {
         var coords = Geom.tickCoords as Lang.Array;
         for (var i = 0; i < 60; i++) {
             var t = coords[i] as Lang.Array<Lang.Number>;
-            if (i % 15 == 0) {
+            if (i == secondTick) {
+                // Current second: lit in the seconds-counter accent color.
+                dc.setColor(accent, Graphics.COLOR_TRANSPARENT);
+                dc.setPenWidth(3);
+            } else if (i % 15 == 0) {
                 // Quarter ticks (12/3/6/9) carry the accent color.
                 dc.setColor(accent, Graphics.COLOR_TRANSPARENT);
                 dc.setPenWidth(2);

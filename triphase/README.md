@@ -5,6 +5,12 @@ on screen. Content never changes; **emphasis** does. 3–4 fields render at full
 brightness based on time of day (morning / day / evening phases, boundaries
 user-configurable, plus a `flat` mode), the rest recede to muted gray.
 
+The tick ring doubles as a seconds indicator: the tick matching the current
+second lights up in the accent color (the same color as the numeric seconds
+counter, second 0 at 12 o'clock, advancing clockwise) while every other tick
+keeps its regular unlit color. It follows the `showSeconds`/`showTicks`
+settings and, like the rest of the chrome, is not drawn in low power.
+
 Built against spec v1.0 (TriPhase Watch Face — Build Specification).
 
 ## Building
