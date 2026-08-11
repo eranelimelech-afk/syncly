@@ -71,10 +71,16 @@ changes.
    including the Pro 51mm. Related fix found by the compiler: the manifest
    permission for complications is `ComplicationSubscriber` — the spec's
    `Complications` is not a valid permission id.
-2. **HRV status**: no documented watch-face API. The sanctioned §5 substitution
-   is implemented — the HRV metric renders Stress from `SensorHistory` and is
-   labeled STRESS on screen so it never misrepresents its source. If a future
-   SDK exposes HRV, wire it into `Fields._hrvValue` and restore the label.
+2. **HRV status — definitively verified as unavailable.** Checked against SDK
+   9.2.0 (June 2026, the newest released SDK): the complete
+   `COMPLICATION_TYPE_*` list has no HRV entry, `SensorHistory` has no HRV
+   series, and the only "HRV" symbol in the entire API is `LANGUAGE_HRV`
+   (Croatian). Garmin computes HRV status on-device but does not expose it to
+   Connect IQ watch faces. The sanctioned §5 substitution is implemented: the
+   HRV slot renders Stress (SensorHistory → Stress complication fallback) and
+   is labeled STRESS on screen so it never misrepresents its source. Re-run
+   this check on each new SDK release; a guarded reference cannot be added
+   preemptively because Monkey C requires the symbol to exist at compile time.
 3. **Training readiness**: dropped (not exposed), per spec.
 4. **Fonts**: currently the nearest built-in fonts. The spec's custom bitmap
    fonts (Barlow Semi Condensed, tabular figures, per-size `.fnt` filtered to

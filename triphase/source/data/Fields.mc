@@ -58,6 +58,9 @@ module Fields {
         if (comp has :COMPLICATION_TYPE_CALENDAR_EVENTS) {
             _compTypes[:calendar] = comp.COMPLICATION_TYPE_CALENDAR_EVENTS;
         }
+        if (comp has :COMPLICATION_TYPE_STRESS) {
+            _compTypes[:stress] = comp.COMPLICATION_TYPE_STRESS;
+        }
         var keys = _compTypes.keys();
         for (var i = 0; i < keys.size(); i++) {
             var type = _compTypes[keys[i]] as Toybox.Complications.Type;
@@ -275,10 +278,21 @@ module Fields {
     }
 
     // Stress stands in for HRV status (spec section 5 substitution).
+    // Verified against SDK 9.2.0 (June 2026): the API exposes no HRV to
+    // watch faces at all - no complication type, no SensorHistory series
+    // (the only "HRV" symbol in the entire API is LANGUAGE_HRV, Croatian).
+    // Chain: SensorHistory stress -> Stress complication -> "--".
     function _stressValue() as Lang.String? {
         var v = _latestSensorSample(:getStressHistory);
         if (v != null) {
             return v.format("%d");
+        }
+        var cv = _complicationValue(:stress);
+        if (cv instanceof Lang.Number) {
+            return cv.format("%d");
+        }
+        if (cv instanceof Lang.Float) {
+            return cv.toNumber().format("%d");
         }
         return null;
     }
