@@ -16,6 +16,8 @@ import PromptStudio from "./components/PromptStudio.jsx";
 import Schedule from "./components/Schedule.jsx";
 import Performance from "./components/Performance.jsx";
 import LiftView from "./components/LiftView.jsx";
+import ShotRoom from "./components/ShotRoom.jsx";
+import Pipeline from "./components/Pipeline.jsx";
 
 const TABS = [
   { id: "bible", he: "ביבליה" },
@@ -25,13 +27,15 @@ const TABS = [
   { id: "lab", he: "מעבדת ניסויים", counter: "amends" },
   { id: "next", he: "המלצות המשך" },
   { id: "prompts", he: "תבניות פרומפט" },
+  { id: "shot", he: "חדר צילום" },
+  { id: "pipe", he: "צנרת הפקה" },
   { id: "plan", he: "לוח פרסום" },
   { id: "perf", he: "ביצועים" },
   { id: "work", he: "מה עובד" },
 ];
 
 /** Tabs that require a locked bible. Only Romy Vane has one today. */
-const BIBLE_ONLY = ["bible", "ref", "prompts", "lab"];
+const BIBLE_ONLY = ["bible", "ref", "prompts", "lab", "shot"];
 
 export default function App() {
   const [persona, setPersona] = useState("vane");
@@ -101,6 +105,8 @@ export default function App() {
             {tab === "lab" && (<><h2 style={{ marginTop: 20 }}>מעבדת ניסויים <em>השערה · משתנה אחד · מדד הכרעה מראש</em></h2>
               <HookLab amend={amend} onAmend={(id, v) => setAmend((s) => ({ ...s, [id]: v }))} /></>)}
             {tab === "prompts" && (<><h2 style={{ marginTop: 20 }}>תבניות פרומפט <em>נבנות מהביבליה, לא נכתבות ביד</em></h2><PromptStudio /></>)}
+            {tab === "shot" && (<><h2 style={{ marginTop: 20 }}>חדר צילום <em>תנועת מצלמה · זוויות רפרנס · מנוע</em></h2><ShotRoom /></>)}
+            {tab === "pipe" && (<><h2 style={{ marginTop: 20 }}>צנרת הפקה <em>שישה שלבים · תנאי יציאה לכל שלב</em></h2><Pipeline queue={queue} qa={qa} /></>)}
 
             {tab === "room" && (
               <ControlRoom persona={p} posts={posts} queue={queue} qa={qa} totals={totals} openAmends={openAmends}
