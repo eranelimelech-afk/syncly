@@ -8,10 +8,14 @@
 |---|---|---|
 | `src/data/camera.js` | Camera Movement — The Full Catalogue | תבנית שש המשבצות, 37 תנועות ב־8 קבוצות, וה־AI note לכל תנועה |
 | `src/data/camera.js` | High-Impact Camera Moves · Kling Camera Toolkit | העיקרון שלתנועה צריכה סיבה, והכלל שפרומפט מתחיל בזווית המצלמה |
-| `src/data/engines.js` | Seedance 2.0 · Kling 3.0 · AI Video Settings · AI Video Editing | יכולות לכל מנוע: פריים פתיחה וסיום, Omni Reference, רב־שוט, רצף מתוזמן, סנכרון שפתיים |
+| `src/data/engines.js` | **קטלוג מודלים חי, נקרא 22.8.2026** | 38 מנועים ויכולותיהם. ה־PDFים תיארו מצב ישן — Seedance 2.5 ומשפחת Nano Banana לא מופיעים בהם כלל |
 | `src/data/pipeline.js` | The AI Creator Workflow | שישה שלבים, המטרה של כל שלב, והמלכודת שלו |
 | `src/data/pipeline.js` · `CRAFT` | TikTok Secrets · Kling 3.0 · AI Video Editing | כללי מלאכה טכניים בלבד — אורך קליפ ראשון, טקסט על המסך, ייצוא 1080p30 |
 | `src/data/lexicon.js` | — | היטל אנגלי של הביבליה. לא מקור נוסף; נכשל בטעינה אם הוא יוצא מסנכרון |
+
+**הערה על תוקף:** מדריכי המנועים ב־PDF כבר לא מדויקים. הם מכירים Seedance 2.0
+ו־Kling 3.0 בלבד; בקטלוג יש Seedance 2.5 עם 30 שניות, וחמישה מודלים במשפחת
+Nano Banana במקום אחד. `engines.js` נקרא מהקטלוג, לא מהם — ונושא תאריך קריאה.
 
 `ai_models_guide` ו־`AI Chat Cheat Sheet` לא ייצרו קוד. הראשון גנרי, השני מתאר איך לדבר עם
 צ׳אט — שניהם רלוונטיים לשלב 2 בצנרת ומסוכמים שם כתנאי יציאה, לא כמודול.

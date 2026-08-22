@@ -35,7 +35,6 @@ function angleState(id) {
   const s = SHOTS.find((x) => x.id === id);
   if (!s) return { id, he: id, ok: false, reason: "זווית לא מוגדרת בגיליון" };
   if (s.have === 0) return { ...s, ok: false, reason: "אין רפרנס כלל" };
-  if (s.stale) return { ...s, ok: false, reason: "נוצר לפני נעילת הביבליה" };
   if (s.have < s.need) return { ...s, ok: true, warn: `כיסוי חלקי ${s.have}/${s.need}` };
   return { ...s, ok: true };
 }

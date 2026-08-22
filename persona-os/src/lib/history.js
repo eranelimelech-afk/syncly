@@ -1,4 +1,4 @@
-import { WORLD, PURPOSE, FORMAT, HOOK, SLOT, MODE, CLUES, WORLD_PURPOSE } from "../data/dimensions.js";
+import { WORLD, PURPOSE, FORMAT, HOOK, SLOT, MODE, CLUES, defaultPurpose, purposesFor } from "../data/dimensions.js";
 
 /**
  * TEMPORARY seeded generator. Replace with real sources — see docs/ROADMAP.md step 1.
@@ -44,7 +44,9 @@ export function buildHistory(personaId) {
     const world = wpick(r, WORLD), format = wpick(r, FORMAT), hook = wpick(r, HOOK), slot = wpick(r, SLOT);
     const mode = r() > 0.26 ? "social" : "editorial";
     const clue = r() > 0.55 ? "one" : r() > 0.25 ? "none" : "many";
-    const purpose = r() > 0.68 ? wpick(r, PURPOSE) : WORLD_PURPOSE[world];
+    // Pick from what the world can honestly carry, not from all five purposes.
+    const options = purposesFor(world);
+    const purpose = r() > 0.68 ? options[Math.floor(r() * options.length)] : defaultPurpose(world);
     const qa = Math.round(60 + r() * 39);
     const boost = 1 + (qa - 80) / 180;
     const m = (k) => WORLD[world][k] * PURPOSE[purpose][k] * FORMAT[format][k] * HOOK[hook][k] * SLOT[slot][k] * MODE[mode][k] * CLUES[clue][k];

@@ -199,3 +199,106 @@ test("MIN_N is the documented floor", () => {
   const dim = analyseLift(posts, DIMS.filter((d) => d.key === "clue"), "followPer1k")[0];
   assert.equal(dim.rows.find((r) => r.v === "one").low, false, "exactly MIN_N clears the floor");
 });
+
+// --- engine registry ------------------------------------------------------
+import { ENGINES, CAPS, enginesFor, needsOf, coverGaps, longestVideo } from "../../data/engines.js";
+import { moveById } from "../../data/camera.js";
+
+test("every engine declares only known capabilities and a unique id", () => {
+  const caps = new Set(Object.keys(CAPS));
+  for (const e of ENGINES) {
+    assert.ok(e.kind && e.name && e.vendor !== undefined, `${e.id} is missing metadata`);
+    for (const c of e.caps) assert.ok(caps.has(c), `${e.id} declares unknown cap "${c}"`);
+  }
+  assert.equal(new Set(ENGINES.map((e) => e.id)).size, ENGINES.length);
+});
+
+test("the bible's ban names one model, not the family", () => {
+  const banned = ENGINES.filter((e) => e.lock && e.lock.includes("אסור"));
+  assert.equal(banned.length, 1);
+  assert.equal(banned[0].id, "nano_banana_2");
+  const family = ENGINES.filter((e) => e.id.startsWith("nano_banana"));
+  assert.ok(family.length > 1, "the family has other members the ban does not cover");
+  assert.equal(family.find((e) => e.id === "nano_banana_pro").lock.includes("אסור"), false);
+});
+
+test("a capability no video engine has can be bought back as a second pass", () => {
+  const needs = needsOf({ move: moveById("slowzoom"), speaks: true, multiShot: true, seconds: 12 });
+  const best = enginesFor(needs, "video")[0];
+  assert.equal(best.eligible, false, "this shot still fits no single video engine");
+  const gaps = coverGaps(best.missing);
+  const lip = gaps.find((g) => g.cap === "lipSync");
+  assert.equal(lip.covered, true, "lip sync is available as a finishing pass");
+  assert.equal(gaps.find((g) => g.cap === "multiShot").covered, false, "multi-shot is not — split the shot");
+});
+
+test("enginesFor puts eligible engines first", () => {
+  const list = enginesFor(["startFrame", "omniRef"], "video");
+  const firstIneligible = list.findIndex((e) => !e.eligible);
+  if (firstIneligible !== -1) {
+    assert.ok(list.slice(firstIneligible).every((e) => !e.eligible), "eligibility must not interleave");
+  }
+});
+
+test("the longest video engine is reported for the split-the-shot case", () => {
+  assert.ok(longestVideo().maxSec >= 15);
+});
+
+// --- binned references ----------------------------------------------------
+import { SHOTS, ARCHIVED, coverage, missingShots } from "../../data/identitySheet.js";
+
+test("binned angles count as zero coverage, not partial", () => {
+  for (const a of ARCHIVED) {
+    assert.equal(SHOTS.find((s) => s.id === a.shot).have, 0, `${a.shot} still counts coverage after binning`);
+  }
+  assert.equal(SHOTS.some((s) => "stale" in s), false, "stale is gone — an angle is usable or it is not");
+});
+
+test("coverage and the shot list agree", () => {
+  const c = coverage();
+  const gap = missingShots().reduce((a, s) => a + s.gap, 0);
+  assert.equal(c.have + gap, c.need, "what is covered plus what is missing must be the whole sheet");
+  assert.equal(c.pct, Math.round((c.have / c.need) * 100));
+});
+
+// --- world to purpose mapping ---------------------------------------------
+import { WORLD, WORLD_PURPOSE, PURPOSE, defaultPurpose, purposesFor, worldCan } from "../../data/dimensions.js";
+
+test("every world maps to purposes that exist, with its default among them", () => {
+  for (const [w, m] of Object.entries(WORLD_PURPOSE)) {
+    assert.ok(WORLD[w], `${w} is not a world`);
+    assert.ok(m.src, `${w} has no bible clause behind it`);
+    assert.ok(m.can.includes(m.def), `${w} default "${m.def}" is not in its own can list`);
+    for (const p of m.can) assert.ok(PURPOSE[p], `${w} can "${p}" which is not a purpose`);
+  }
+  assert.deepEqual(Object.keys(WORLD_PURPOSE).sort(), Object.keys(WORLD).sort());
+});
+
+test("the mapping follows the bible: rooms carry the story", () => {
+  // "זהות מסתורית וסיפור מתמשך סביב חדרים" — hotels defaulting to lifestyle
+  // was the code contradicting the source of truth.
+  assert.equal(defaultPurpose("hotels"), "story");
+  assert.ok(worldCan("hotels", "curiosity"));
+  assert.equal(worldCan("fitness", "story"), false, "fitness carries no plot");
+});
+
+test("the remap moves no world quota", () => {
+  const total = Object.values(WORLD).reduce((a, w) => a + w.target, 0);
+  assert.ok(Math.abs(total - 1) < 1e-9, "world quotas still sum to 100%");
+  assert.equal(WORLD.hotels.target, 0.3);
+  assert.equal(WORLD.room707.target, 0.05);
+});
+
+test("Lifestyle no longer holds the whole quota", () => {
+  const q = {};
+  for (const [w, cfg] of Object.entries(WORLD)) {
+    const p = defaultPurpose(w);
+    q[p] = (q[p] ?? 0) + cfg.target;
+  }
+  assert.ok(q.lifestyle < 0.6, `lifestyle is ${(q.lifestyle * 100).toFixed(0)}%, was 90%`);
+  assert.ok(q.story > 0.2, "story now carries real weight");
+});
+
+test("purposesFor never returns an empty set", () => {
+  for (const w of Object.keys(WORLD)) assert.ok(purposesFor(w).length > 0);
+});

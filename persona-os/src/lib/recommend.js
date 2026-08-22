@@ -1,4 +1,4 @@
-import { WORLD, PURPOSE, FORMAT, HOOK, SLOT, WORLD_PURPOSE } from "../data/dimensions.js";
+import { WORLD, PURPOSE, FORMAT, HOOK, SLOT, defaultPurpose, purposesFor } from "../data/dimensions.js";
 import { SYMBOLS, LADDER } from "../data/bible.js";
 import { LINES } from "./history.js";
 
@@ -16,12 +16,21 @@ export const NORTH = "followPer1k";
 export function recommend(posts, count = 7) {
   const n = posts.length;
   const base = posts.reduce((a, p) => a + p[NORTH], 0) / n;
+  // Same sample floor the lift view uses. A purpose measured on two posts must
+  // not steer the next seven — it would swing the plan on noise, and the plan is
+  // what gets produced. Below the floor the value falls back to the average,
+  // which makes it neutral rather than persuasive.
   const avgBy = (key, val) => {
     const s = posts.filter((p) => p[key] === val);
-    return s.length ? s.reduce((a, p) => a + p[NORTH], 0) / s.length : base;
+    return s.length >= MIN_N ? s.reduce((a, p) => a + p[NORTH], 0) / s.length : base;
   };
-  const bestOf = (key, dict) =>
-    Object.keys(dict).map((v) => ({ v, s: avgBy(key, v) })).sort((a, b) => b.s - a.s)[0].v;
+  const measured = (key, val) => posts.filter((p) => p[key] === val).length >= MIN_N;
+  // Only values with enough posts behind them may win "best".
+  const bestOf = (key, dict) => {
+    const ks = Object.keys(dict).filter((v) => measured(key, v));
+    if (!ks.length) return Object.keys(dict)[0];
+    return ks.map((v) => ({ v, s: avgBy(key, v) })).sort((a, b) => b.s - a.s)[0].v;
+  };
 
   const bestFormat = bestOf("format", FORMAT);
   const bestSlot = bestOf("slot", SLOT);
@@ -47,7 +56,19 @@ export function recommend(posts, count = 7) {
     const w = worlds[i % Math.min(worlds.length, 5)];
     const sym = syms[i % syms.length];
     const isPlot = w.w === "room707" || (i === 3 && !!nextEp);
-    const purpose = isPlot ? "curiosity" : w.w === "community" ? "participate" : i % 3 === 1 ? bestPurpose : WORLD_PURPOSE[w.w];
+    // Within a world, prefer the purpose that world can carry AND that has
+    // measured best. Falls back to the world's default. This is where the remap
+    // pays: a hotel post is no longer Lifestyle by default.
+    const options = purposesFor(w.w);
+    const ranked = options
+      .filter((p) => measured("purpose", p))
+      .map((p) => ({ p, s: avgBy("purpose", p) }))
+      .sort((a, b) => b.s - a.s);
+    const purpose = isPlot
+      ? "curiosity"
+      : options.includes(bestPurpose) && i % 3 === 1 ? bestPurpose
+      : ranked.length ? ranked[0].p
+      : defaultPurpose(w.w);
     const format = w.w === "community" ? "still" : w.w === "fitness" ? "reel" : bestFormat;
     const slot = w.w === "morning" || w.w === "fitness" ? "morning" : bestSlot;
     const mode = w.w === "hotels" || w.w === "dining" ? "editorial" : "social";

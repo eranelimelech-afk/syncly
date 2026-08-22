@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { MOVES, CAM_GROUPS, SLOTS, FIT } from "../data/camera.js";
-import { CAPS } from "../data/engines.js";
+import { CAPS, coverGaps, longestVideo, CATALOGUE_READ } from "../data/engines.js";
 import { SYMBOLS } from "../data/bible.js";
 import { buildShot, LOCATIONS, LIGHTS, OUTFITS } from "../lib/shot.js";
 import { Alert } from "./ui.jsx";
@@ -130,7 +130,7 @@ export default function ShotRoom() {
           </Alert>)}
       </div>
 
-      <h2>מנועים שמסוגלים לשאת את השוט <em>המערכת לא בוחרת · DECISIONS #1 פתוחה</em></h2>
+      <h2>מנועים שמסוגלים לשאת את השוט <em>{shot.engines.length} מנועי וידאו · נקרא מהקטלוג ב־{CATALOGUE_READ} · המערכת לא בוחרת</em></h2>
       <div className="card" style={{ padding: "8px 14px" }}>
         <div className="tags" style={{ marginBottom: 6 }}>
           {shot.needs.map((n) => (<span className="tag" key={n} title={CAPS[n].why}>{CAPS[n].he}</span>))}
@@ -139,14 +139,29 @@ export default function ShotRoom() {
           <div className="crow" key={e.id}>
             <span className="dot" style={{ background: e.eligible ? "#4E9B76" : "#BE4C3D" }} />
             <span className={"ctxt " + (e.eligible ? "" : "off")}>{e.name}</span>
-            {e.lock && <span className="src">{e.lock}</span>}
+            {e.lock && <span className="src" style={e.lock.includes("אסור") ? { color: "#CE7C6B", borderColor: "rgba(190,76,61,.4)" } : undefined}>{e.lock.replace(/\*\*/g, "")}</span>}
             <span className="hint">{e.eligible ? "תומך בכל מה שהשוט דורש" : "חסר: " + e.missing.map((c) => CAPS[c].he).join(", ")}</span>
           </div>))}
-        {eligible.length === 0 && (
-          <Alert kind="warn" icon="⚠">
-            <b>אף מנוע וידאו לא מכסה את כל מה שהשוט דורש.</b> פצל לשני שוטים, או ותר על אחת הדרישות.
-            זה בדיוק המקרה שבו נעילה למנוע אחד עולה כסף — ראה docs/DECISIONS.md.
-          </Alert>)}
+        {eligible.length === 0 && (() => {
+          const closest = shot.engines[0];
+          const gaps = coverGaps(closest.missing);
+          const rescued = gaps.filter((g) => g.covered);
+          const stuck = gaps.filter((g) => !g.covered);
+          return (
+            <Alert kind="warn" icon="⚠">
+              <b>אף מנוע וידאו לא מכסה את הכל בגנרציה אחת.</b> הכי קרוב: {closest.name}.
+              {rescued.length > 0 && (
+                <div style={{ marginTop: 6 }}>
+                  ניתן להשלים במעבר שני: {rescued.map((g) => `${CAPS[g.cap].he} → ${g.by.map((e) => e.name).join(" / ")}`).join(" · ")}
+                </div>)}
+              {stuck.length > 0 && (
+                <div style={{ marginTop: 6 }}>
+                  אין השלמה ל־{stuck.map((g) => CAPS[g.cap].he).join(", ")} — פצל לשני שוטים או ותר על הדרישה.
+                </div>)}
+              {seconds > (longestVideo().maxSec ?? 0) && (
+                <div style={{ marginTop: 6 }}>הארוך ביותר הוא {longestVideo().name} ב־{longestVideo().maxSec} שניות.</div>)}
+            </Alert>);
+        })()}
       </div>
 
       <h2>שש המשבצות</h2>

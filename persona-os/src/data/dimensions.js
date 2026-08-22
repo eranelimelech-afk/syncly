@@ -73,7 +73,42 @@ export const METRICS = [
   { key: "subPer1k",    he: "מנויים ל־1,000 חשיפות",       short: "מנויים" },
 ];
 
+/**
+ * Which purposes each content world can genuinely serve, and which it defaults to.
+ *
+ * This used to map five of seven worlds to `lifestyle`, which is where the 90%
+ * Lifestyle share came from — and it contradicted the bible. The differentiator
+ * clause reads "זהות מסתורית וסיפור מתמשך סביב חדרים, מפתחות ומעטפות": the rooms
+ * ARE the story. A hotel post defaulting to Lifestyle was the code disagreeing
+ * with the source of truth, so the bible wins.
+ *
+ * Purpose is a per-post choice, not a property of a world. `can` is the honest
+ * set; `def` is only what to reach for when nothing else decides. Every entry
+ * carries `src`, the bible clause behind it — same discipline as a QA check.
+ * No world quota changed: this moves nothing between worlds.
+ */
 export const WORLD_PURPOSE = {
-  hotels: "lifestyle", morning: "lifestyle", fitness: "lifestyle",
-  scenery: "lifestyle", dining: "lifestyle", community: "participate", room707: "curiosity",
+  hotels:   { def: "story", can: ["story", "curiosity", "lifestyle", "authority"],
+              src: "בידול · סיפור מתמשך סביב חדרים, מפתחות ומעטפות" },
+  morning:  { def: "lifestyle", can: ["lifestyle", "story"],
+              src: "מראה קבוע · שגרת בוקר במלון" },
+  fitness:  { def: "lifestyle", can: ["lifestyle", "authority"],
+              src: "לבוש · כושר שחור מינימליסטי — אין כאן עלילה" },
+  scenery:  { def: "lifestyle", can: ["lifestyle", "curiosity", "story"],
+              src: "הגדרה · Luxury Hotel & Travel Creator" },
+  dining:   { def: "story", can: ["story", "curiosity", "lifestyle"],
+              src: "צורת דיבור · ״One drink. That was the plan.״" },
+  community:{ def: "participate", can: ["participate", "authority"],
+              src: "צורת דיבור · שאלות ישירות" },
+  room707:  { def: "curiosity", can: ["curiosity", "story"],
+              src: "כללי עלילה · פרט אחד לפרק" },
 };
+
+/** The purpose to reach for when nothing else decides. */
+export const defaultPurpose = (world) => WORLD_PURPOSE[world].def;
+
+/** Every purpose this world can honestly carry. */
+export const purposesFor = (world) => WORLD_PURPOSE[world].can;
+
+/** Can this world carry that purpose without contradicting the bible? */
+export const worldCan = (world, purpose) => WORLD_PURPOSE[world].can.includes(purpose);
