@@ -62,6 +62,15 @@ export function recommend(posts, count = 7) {
   return { worlds, purposes, plan, nextEp, bestPurpose };
 }
 
+/**
+ * Below this many posts a cell is noise, not a reading. Thirty posts spread over
+ * seven dimensions leaves most cells with two to four posts, and a two-post cell
+ * will happily report a 66% swing. Cells under the floor are still shown — the
+ * gap is information — but they are marked and kept off the headline board so a
+ * fluke cannot be mistaken for a finding.
+ */
+export const MIN_N = 5;
+
 /** Lift analysis: each value vs the persona average, for any metric. */
 export function analyseLift(posts, dims, metric) {
   const base = posts.reduce((a, p) => a + p[metric], 0) / posts.length;
@@ -74,7 +83,7 @@ export function analyseLift(posts, dims, metric) {
       // A metric can legitimately be zero across every post (e.g. Fanvue
       // subscribers for an Instagram-only persona). Without this, lift is NaN.
       const lift = base === 0 ? 0 : ((avg - base) / base) * 100;
-      return { v, he: d.dict[v].he, n: s.length, lift };
+      return { v, he: d.dict[v].he, n: s.length, lift, low: s.length < MIN_N };
     }).filter(Boolean).sort((a, b) => b.lift - a.lift),
   }));
 }

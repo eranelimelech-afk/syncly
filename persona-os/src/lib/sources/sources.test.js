@@ -167,3 +167,35 @@ test("a failing backend surfaces the status instead of returning empty data", as
   const fetchImpl = async () => ({ ok: false, status: 401 });
   await assert.rejects(() => loadPosts({ source: "live", store, fetchImpl }), /returned 401/);
 });
+
+// --- lift analysis sample floor -------------------------------------------
+import { analyseLift, MIN_N } from "../recommend.js";
+import { DIMS } from "../../data/dimensions.js";
+
+const post = (over) => withRates({
+  id: over.id, day: "1.1", world: "hotels", purpose: "lifestyle", format: "reel",
+  hook: "cut", slot: "evening", mode: "social", clue: "one", qa: 90,
+  reach: 1000, shares: 10, saves: 10, follows: 10, visits: 10, subs: 1, line: "", watch: null,
+  ...over,
+});
+
+test("a cell below the sample floor is marked, not silently trusted", () => {
+  const posts = [
+    ...Array.from({ length: 20 }, (_, i) => post({ id: `a${i}`, clue: "one" })),
+    ...Array.from({ length: 2 }, (_, i) => post({ id: `b${i}`, clue: "many", follows: 900 })),
+  ];
+  const dim = analyseLift(posts, DIMS.filter((d) => d.key === "clue"), "followPer1k")[0];
+  const many = dim.rows.find((r) => r.v === "many");
+  const one = dim.rows.find((r) => r.v === "one");
+  assert.equal(many.n, 2);
+  assert.equal(many.low, true, "a two-post cell must be flagged");
+  assert.equal(one.low, false, "a twenty-post cell must not be");
+  assert.ok(many.lift > 100, "the flagged cell is exactly the kind that shouts loudest");
+});
+
+test("MIN_N is the documented floor", () => {
+  assert.equal(MIN_N, 5);
+  const posts = Array.from({ length: MIN_N }, (_, i) => post({ id: `c${i}` }));
+  const dim = analyseLift(posts, DIMS.filter((d) => d.key === "clue"), "followPer1k")[0];
+  assert.equal(dim.rows.find((r) => r.v === "one").low, false, "exactly MIN_N clears the floor");
+});
