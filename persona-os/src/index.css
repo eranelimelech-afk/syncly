@@ -96,7 +96,7 @@ tbody tr:hover{background:#1A1F27}
 .scroll{overflow-x:auto}
 
 .lrow{display:flex;align-items:center;gap:10px;padding:7px 0}
-.lname{width:172px;flex:0 0 auto;font-size:12.5px}
+.lname{width:210px;flex:0 0 auto;font-size:12.5px}
 .ltrack{flex:1;height:20px;background:#191E26;border-radius:4px;position:relative;overflow:hidden}
 .lmid{position:absolute;inset-block:0;inset-inline-start:50%;border-inline-start:1px dashed #39414E}
 .lfill{position:absolute;top:3px;bottom:3px;border-radius:3px}
