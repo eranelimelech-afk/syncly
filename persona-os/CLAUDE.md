@@ -59,6 +59,7 @@ Romy Vane. ממנה נגזרים ארבעה דברים, ואף אחד מהם ל�
 ```bash
 npm install
 npm run dev
+npm test      # node --test, בלי תלויות
 ```
 
 ## מפת קבצים
@@ -76,6 +77,7 @@ src/data/engines.js       יכולות מנועים כנתונים — המער�
 src/data/pipeline.js      שישה שלבי הפקה עם תנאי יציאה + רשימת מה לא נעשה
 src/data/lexicon.js       היטל אנגלי של הביבליה לפרומפטים
 src/lib/history.js        מחולל נתונים זמני — להחלפה
+src/lib/sources/          שכבת המקורות: אינסטגרם, פאנביו, צימוד וסכימה
 src/lib/scoring.js        חישוב ציון QA וזיהוי חוסמים
 src/lib/recommend.js      מנוע ההמלצות
 src/lib/shot.js           בניית שוט: פרומפט + זוויות נדרשות + מנועים כשירים

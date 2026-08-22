@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { PERSONAS } from "./data/bible.js";
 import { QUEUE } from "./data/queue.js";
 import { ALL_ITEMS, RUBRIC, BLOCKERS } from "./data/rubric.js";
 import { EXPERIMENTS } from "./data/experiments.js";
-import { buildHistory } from "./lib/history.js";
+import { loadPosts, SOURCES } from "./lib/sources/index.js";
 import { initChecks } from "./lib/scoring.js";
 
 import Bible from "./components/Bible.jsx";
@@ -35,6 +35,12 @@ const TABS = [
 ];
 
 /** Tabs that require a locked bible. Only Romy Vane has one today. */
+/**
+ * Which source feeds the app. Stays "seeded" until an account is connected —
+ * "live" needs the backend route and the local record store. docs/INSTAGRAM.md.
+ */
+const SOURCE = "seeded";
+
 const BIBLE_ONLY = ["bible", "ref", "prompts", "lab", "shot"];
 
 export default function App() {
@@ -48,7 +54,18 @@ export default function App() {
     return s;
   });
 
-  const posts = useMemo(() => buildHistory(persona), [persona]);
+  // Posts now come through the source layer, so the seam that will carry real
+  // Instagram data is the same one the generator runs through. docs/INSTAGRAM.md.
+  const [feed, setFeed] = useState({ posts: [], notes: [], loading: true, error: null });
+  useEffect(() => {
+    let cancelled = false;
+    setFeed((f) => ({ ...f, loading: true }));
+    loadPosts({ source: SOURCE, persona })
+      .then((r) => !cancelled && setFeed({ ...r, loading: false, error: null }))
+      .catch((e) => !cancelled && setFeed({ posts: [], notes: [], loading: false, error: e.message }));
+    return () => { cancelled = true; };
+  }, [persona]);
+  const posts = feed.posts;
   const queue = QUEUE.filter((q) => q.persona === persona);
   const pending = queue.filter((q) => !qa[q.id].decision).length;
   const p = PERSONAS.find((x) => x.id === persona);
@@ -59,7 +76,7 @@ export default function App() {
       reach: a.reach + x.reach, shares: a.shares + x.shares, follows: a.follows + x.follows,
       visits: a.visits + x.visits, subs: a.subs + x.subs, qa: a.qa + x.qa,
     }), { reach: 0, shares: 0, follows: 0, visits: 0, subs: 0, qa: 0 });
-    return { ...t, qaAvg: Math.round(t.qa / posts.length) };
+    return { ...t, qaAvg: posts.length ? Math.round(t.qa / posts.length) : 0 };
   }, [posts]);
 
   const toggle = (qid, item) =>
@@ -94,7 +111,13 @@ export default function App() {
       </div>
 
       <div className="wrap">
-        {persona !== "vane" && BIBLE_ONLY.includes(tab) ? (
+        {feed.loading ? (
+          <div className="card empty" style={{ marginTop: 20 }}>טוען נתונים…</div>
+        ) : feed.error ? (
+          <div className="card empty" style={{ marginTop: 20, color: "#CE7C6B" }}>
+            נכשלה טעינת הנתונים: {feed.error}
+          </div>
+        ) : persona !== "vane" && BIBLE_ONLY.includes(tab) ? (
           <div className="card empty" style={{ marginTop: 20 }}>
             אין ביבליה נעולה עבור {p.name}. נעל אותה כדי שהשער, גיליון הזהות ותבניות הפרומפט יוכלו לעבוד.
           </div>
@@ -110,6 +133,7 @@ export default function App() {
 
             {tab === "room" && (
               <ControlRoom persona={p} posts={posts} queue={queue} qa={qa} totals={totals} openAmends={openAmends}
+                source={SOURCES[SOURCE]} notes={feed.notes}
                 onOpenItem={(id) => { setTab("gate"); setExpanded(id); }} onOpenLab={() => setTab("lab")} />)}
 
             {tab === "gate" && (<>

@@ -32,11 +32,21 @@ function buildFunnel(totals) {
   });
 }
 
-export default function ControlRoom({ persona, posts, queue, qa, totals, openAmends, onOpenItem, onOpenLab }) {
+export default function ControlRoom({ persona, posts, queue, qa, totals, openAmends, onOpenItem, onOpenLab, source, notes }) {
   const pending = queue.filter((q) => !qa[q.id].decision);
   return (
     <>
-      <h2 style={{ marginTop: 20 }}>{persona.name} <em>{persona.lane} · {posts.length} פוסטים ב־45 הימים האחרונים</em></h2>
+      <h2 style={{ marginTop: 20 }}>{persona.name} <em>{persona.lane} · {posts.length} פוסטים ב־45 הימים האחרונים</em>
+        {source && !source.real && (
+          <span className="tag" style={{ color: "#D9A03F", borderColor: "#D9A03F55" }}>
+            נתונים מיוצרים · {source.he}
+          </span>)}
+      </h2>
+      {notes?.length > 0 && (
+        <div className="alert warn"><span>⚠</span><div>
+          <b>הצימוד לא כיסה הכול.</b>
+          <div style={{ marginTop: 4 }}>{notes.map((n) => <div key={n}>· {n}</div>)}</div>
+        </div></div>)}
       <div className="grid g4">
         <Kpi lbl="חשיפה מצטברת" val={fmt(totals.reach)} sub="אורגני" />
         <Kpi lbl="שיתופים" val={fmt(totals.shares)} sub={`${((totals.shares / totals.reach) * 1000).toFixed(1)} ל־1,000 חשיפות`} />
