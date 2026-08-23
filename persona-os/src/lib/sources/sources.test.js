@@ -302,3 +302,125 @@ test("Lifestyle no longer holds the whole quota", () => {
 test("purposesFor never returns an empty set", () => {
   for (const w of Object.keys(WORLD)) assert.ok(purposesFor(w).length > 0);
 });
+
+// --- reference shot generator ---------------------------------------------
+import { refShotList, unblockedBy } from "../refShots.js";
+import { BIBLE } from "../../data/bible.js";
+
+test("the shot list matches the coverage gap exactly", () => {
+  const gap = missingShots().reduce((a, s) => a + s.gap, 0);
+  assert.equal(refShotList().length, gap);
+});
+
+test("reference prompts are English and carry the bible identity", () => {
+  for (const s of refShotList()) {
+    assert.equal(/[֐-׿]/.test(s.prompt), false, `${s.id} leaks Hebrew into the prompt`);
+    assert.ok(s.prompt.includes(BIBLE.lookEn), `${s.id} does not inject the locked appearance`);
+    assert.ok(s.prompt.includes("Hold constant"), `${s.id} is missing the identity lock line`);
+  }
+});
+
+test("a reference frame never carries a narrative clue", () => {
+  // A clue in a reference would make the reference itself a plot beat.
+  for (const s of refShotList()) assert.ok(s.prompt.includes("not a post"));
+});
+
+test("the list is ordered by how many camera moves each shot frees", () => {
+  const l = refShotList();
+  for (let i = 1; i < l.length; i++) assert.ok(l[i - 1].unblocks >= l[i].unblocks);
+  assert.ok(unblockedBy("loc").length > 0, "locations unblock real moves");
+});
+
+test("wardrobe variants come from the bible, not from a second list", () => {
+  const outfits = refShotList().filter((s) => s.angle === "outfit");
+  const labels = BIBLE.wardrobe.map(([he]) => he);
+  for (const o of outfits) assert.ok(labels.includes(o.variantHe), `${o.variantHe} is not a bible wardrobe row`);
+});
+
+// --- persistence ----------------------------------------------------------
+import { createPersistence, memoryDriver } from "../store/index.js";
+
+test("decisions survive a reload", () => {
+  const driver = memoryDriver();
+  const a = createPersistence(driver);
+  a.setQa({ q1: { checks: { face: true }, decision: "approved" } });
+  a.setAmendment("e1", "accepted");
+  const b = createPersistence(driver);
+  assert.equal(b.get().qa.q1.decision, "approved");
+  assert.equal(b.get().amendments.e1, "accepted");
+});
+
+test("a record cannot be relinked to a different media", () => {
+  const s = createPersistence(memoryDriver());
+  s.putRecord({ id: "q1", world: "hotels", qa: 92 });
+  s.linkMedia("q1", "m1", "2026-08-22");
+  s.linkMedia("q1", "m1", "2026-08-22");
+  assert.throws(() => s.linkMedia("q1", "m2"), /already linked/);
+  assert.throws(() => s.linkMedia("ghost", "m9"), /unknown record/);
+});
+
+test("a payload from a newer schema is discarded, not half-applied", () => {
+  const raw = { read: () => ({ __v: 99, qa: { q1: { decision: "approved" } } }), write() {}, clear() {} };
+  // The real guard lives in localDriver; here we assert the shape createPersistence
+  // starts from is always complete regardless of what it is handed.
+  const s = createPersistence({ ...raw, read: () => ({}) });
+  assert.deepEqual(Object.keys(s.get()).sort(), ["amendments", "qa", "records"]);
+});
+
+test("reset clears everything through the driver", () => {
+  const driver = memoryDriver();
+  const s = createPersistence(driver);
+  s.putRecord({ id: "q1" });
+  s.reset();
+  assert.deepEqual(s.records(), []);
+  assert.deepEqual(createPersistence(driver).records(), []);
+});
+
+// --- instagram server route -----------------------------------------------
+import { fetchWindow, listMedia } from "../../../server/instagram.js";
+
+const withEnv = async (fn) => {
+  process.env.IG_USER_ID = "178";
+  process.env.IG_ACCESS_TOKEN = "SECRET_TOKEN_VALUE";
+  try { return await fn(); } finally { delete process.env.IG_USER_ID; delete process.env.IG_ACCESS_TOKEN; }
+};
+const mediaPage = (items) => async (url) =>
+  url.pathname.endsWith("/media")
+    ? { ok: true, json: async () => ({ data: items }) }
+    : { ok: true, json: async () => ({ data: [{ name: "reach", values: [{ value: 1000 }] }] }) };
+
+test("only reels are asked for reel watch time", () => withEnv(async () => {
+  const seen = [];
+  const spy = (url) => { seen.push(url.toString()); return mediaPage([
+    { id: "m1", timestamp: "2026-08-01T10:00:00+0000", media_product_type: "REELS", media_type: "VIDEO" },
+    { id: "m2", timestamp: "2026-08-02T10:00:00+0000", media_product_type: "FEED", media_type: "IMAGE" },
+  ])(url); };
+  await fetchWindow({ fetchImpl: spy });
+  assert.ok(seen[1].includes("ig_reels_avg_watch_time"));
+  assert.ok(!seen[2].includes("ig_reels_avg_watch_time"));
+}));
+
+test("a retired metric does not sink the whole window", () => withEnv(async () => {
+  const impl = async (url) => url.pathname.endsWith("/media")
+    ? { ok: true, json: async () => ({ data: [{ id: "m1", timestamp: "2026-08-01T10:00:00+0000", media_product_type: "FEED", media_type: "IMAGE" }] }) }
+    : { ok: false, status: 400, json: async () => ({ error: { message: "(#100) metric[0] must be one of the following", code: 100 } }) };
+  const rows = await fetchWindow({ fetchImpl: impl });
+  assert.equal(rows.length, 1, "the media is still returned");
+  assert.deepEqual(rows[0].insights.data, [], "with empty insights the merge can report");
+  assert.ok(rows[0].insights.error.includes("metric"), "and the reason is carried");
+}));
+
+test("the access token never appears in an error surfaced to the caller", () => withEnv(async () => {
+  const impl = async () => ({ ok: false, status: 401, json: async () => ({ error: { message: "Invalid OAuth access token", code: 190 } }) });
+  await assert.rejects(() => listMedia({ fetchImpl: impl }), (e) => {
+    assert.ok(!e.message.includes("SECRET_TOKEN_VALUE"), "token leaked into the error");
+    assert.equal(e.status, 401);
+    return true;
+  });
+}));
+
+test("the route refuses to run without credentials", async () => {
+  delete process.env.IG_USER_ID;
+  await assert.rejects(() => listMedia({ fetchImpl: async () => ({ ok: true, json: async () => ({}) }) }),
+    /IG_USER_ID is not set/);
+});

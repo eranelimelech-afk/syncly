@@ -4,6 +4,7 @@ import { QUEUE } from "./data/queue.js";
 import { ALL_ITEMS, RUBRIC, BLOCKERS } from "./data/rubric.js";
 import { EXPERIMENTS } from "./data/experiments.js";
 import { loadPosts, SOURCES } from "./lib/sources/index.js";
+import { store } from "./lib/store/index.js";
 import { initChecks } from "./lib/scoring.js";
 
 import Bible from "./components/Bible.jsx";
@@ -47,10 +48,13 @@ export default function App() {
   const [persona, setPersona] = useState("vane");
   const [tab, setTab] = useState("bible");
   const [expanded, setExpanded] = useState("q1");
-  const [amend, setAmend] = useState({});
+  // Gate decisions and amendment rulings are persisted — they were being lost on
+  // every refresh, and they are the record of what a human actually approved.
+  const [amend, setAmend] = useState(() => store.get().amendments);
   const [qa, setQa] = useState(() => {
+    const saved = store.get().qa;
     const s = {};
-    QUEUE.forEach((q) => (s[q.id] = { checks: initChecks(q.fails), decision: null }));
+    QUEUE.forEach((q) => (s[q.id] = saved[q.id] ?? { checks: initChecks(q.fails), decision: null }));
     return s;
   });
 
@@ -79,9 +83,10 @@ export default function App() {
     return { ...t, qaAvg: posts.length ? Math.round(t.qa / posts.length) : 0 };
   }, [posts]);
 
+  const persistQa = (next) => { store.setQa(next); return next; };
   const toggle = (qid, item) =>
-    setQa((s) => ({ ...s, [qid]: { ...s[qid], checks: { ...s[qid].checks, [item]: !s[qid].checks[item] } } }));
-  const decide = (qid, d) => setQa((s) => ({ ...s, [qid]: { ...s[qid], decision: d } }));
+    setQa((s) => persistQa({ ...s, [qid]: { ...s[qid], checks: { ...s[qid].checks, [item]: !s[qid].checks[item] } } }));
+  const decide = (qid, d) => setQa((s) => persistQa({ ...s, [qid]: { ...s[qid], decision: d } }));
   const approvedMap = Object.fromEntries(Object.entries(qa).map(([k, v]) => [k, v.decision]));
   const counters = { pending, amends: openAmends };
 
@@ -91,6 +96,10 @@ export default function App() {
         <div className="topin">
           <div className="brand"><b>PersonaOS</b><span>BIBLE-LOCKED PUBLISHING</span></div>
           <div className="psel">
+            <button className="pchip" title={`נשמר ב־${store.driverName}`}
+              onClick={() => { if (confirm("לאפס את כל ההחלטות והאישורים השמורים?")) { store.reset(); location.reload(); } }}>
+              איפוס החלטות
+            </button>
             {PERSONAS.map((x) => (
               <button key={x.id} className={"pchip " + (persona === x.id ? "on" : "")} onClick={() => setPersona(x.id)}>
                 <span className="dot" style={{ background: x.color }} />{x.name}
@@ -126,7 +135,7 @@ export default function App() {
             {tab === "bible" && (<><h2 style={{ marginTop: 20 }}>{p.name} — Character Bible <em>{p.lane}</em></h2><Bible /></>)}
             {tab === "ref" && (<><h2 style={{ marginTop: 20 }}>גיליון זהות <em>ספריית הרפרנסים שכל נכס נבדק מולה</em></h2><IdentitySheet /></>)}
             {tab === "lab" && (<><h2 style={{ marginTop: 20 }}>מעבדת ניסויים <em>השערה · משתנה אחד · מדד הכרעה מראש</em></h2>
-              <HookLab amend={amend} onAmend={(id, v) => setAmend((s) => ({ ...s, [id]: v }))} /></>)}
+              <HookLab amend={amend} onAmend={(id, v) => { store.setAmendment(id, v); setAmend((s) => ({ ...s, [id]: v })); }} /></>)}
             {tab === "prompts" && (<><h2 style={{ marginTop: 20 }}>תבניות פרומפט <em>נבנות מהביבליה, לא נכתבות ביד</em></h2><PromptStudio /></>)}
             {tab === "shot" && (<><h2 style={{ marginTop: 20 }}>חדר צילום <em>תנועת מצלמה · זוויות רפרנס · מנוע</em></h2><ShotRoom /></>)}
             {tab === "pipe" && (<><h2 style={{ marginTop: 20 }}>צנרת הפקה <em>שישה שלבים · תנאי יציאה לכל שלב</em></h2><Pipeline queue={queue} qa={qa} /></>)}

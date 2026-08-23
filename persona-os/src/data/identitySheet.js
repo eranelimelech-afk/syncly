@@ -8,16 +8,30 @@
  * Those angles now read 0, which is what they were worth: `stale` references
  * already failed the check while still looking like partial coverage.
  */
+/**
+ * `variants` names the individual shots an angle is made of, so a gap of six is
+ * a list of six briefs rather than a number. `need` is derived from it — the two
+ * cannot drift apart. Wardrobe variants come from the bible, not from here.
+ */
 export const SHOTS = [
-  { id: "portrait", he: "Portrait",             note: "פנים מלאות, אור טבעי",                    have: 4, need: 4 },
-  { id: "threeq",   he: "Three Quarter View",   note: "45 מעלות לשני הצדדים",                    have: 3, need: 4 },
-  { id: "side",     he: "Side Profile",         note: "פרופיל מלא, שני צדדים",                   have: 0, need: 2 },
-  { id: "full",     he: "Full Body",            note: "פרופורציות גוף לנעילה",                   have: 0, need: 3 },
-  { id: "expr",     he: "Different Expressions",note: "שקט, חיוך קל, מבט ישיר, הפתעה מאופקת",    have: 2, need: 6 },
-  { id: "outfit",   he: "Different Outfits",    note: "חמשת מצבי הלבוש בביבליה",                 have: 2, need: 5 },
-  { id: "loc",      he: "Different Locations",  note: "לובי, סוויטה, בר, מרפסת, מסדרון, ספא",    have: 0, need: 6 },
-  { id: "light",    he: "Different Lighting",   note: "בוקר, שעת זהב, לילה, מלאכותי",            have: 2, need: 4 },
-];
+  { id: "portrait", he: "Portrait", note: "פנים מלאות, אור טבעי", have: 4,
+    variants: ["מבט ישר למצלמה", "רבע פנייה קלה", "סנטר מעט מורם", "סנטר מעט מונמך"] },
+  { id: "threeq", he: "Three Quarter View", note: "45 מעלות לשני הצדדים", have: 3,
+    variants: ["45° ימינה", "45° שמאלה", "45° ימינה, מבט למצלמה", "45° שמאלה, מבט הצידה"] },
+  { id: "side", he: "Side Profile", note: "פרופיל מלא, שני צדדים", have: 0,
+    variants: ["פרופיל ימין מלא", "פרופיל שמאל מלא"] },
+  { id: "full", he: "Full Body", note: "פרופורציות גוף לנעילה", have: 0,
+    variants: ["עמידה חזיתית, גוף מלא", "עמידה בפרופיל, גוף מלא", "ישיבה, גוף מלא"] },
+  { id: "expr", he: "Different Expressions", note: "שקט, חיוך קל, מבט ישיר, הפתעה מאופקת", have: 2,
+    variants: ["שקט, ניטרלי", "חיוך קל ומאופק", "מבט ישיר ושקט", "הפתעה מאופקת",
+               "מחשבה, מבט הצידה", "הומור יבש, זווית פה אחת"] },
+  { id: "outfit", he: "Different Outfits", note: "חמשת מצבי הלבוש בביבליה", have: 2,
+    variants: null },
+  { id: "loc", he: "Different Locations", note: "לובי, סוויטה, בר, מרפסת, מסדרון, ספא", have: 0,
+    variants: ["לובי המלון", "סוויטה", "בר המלון", "מרפסת", "מסדרון קומה 7", "ספא"] },
+  { id: "light", he: "Different Lighting", note: "בוקר, שעת זהב, לילה, מלאכותי", have: 2,
+    variants: ["בוקר רך", "שעת זהב", "לילה חם", "תאורה מלאכותית של מלון"] },
+].map((s) => ({ ...s, need: s.variants ? s.variants.length : 5 }));
 
 /**
  * What was binned, and why. Kept so nobody re-adds it by accident and so the

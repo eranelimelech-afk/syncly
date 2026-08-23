@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { SHOTS, ARCHIVED, ARCHIVE_NOTE, coverage, missingShots } from "../data/identitySheet.js";
 import { BIBLE } from "../data/bible.js";
 import { Kpi } from "./ui.jsx";
+import { refShotList } from "../lib/refShots.js";
 
 export default function IdentitySheet() {
   const { have, need, pct } = coverage();
   const missing = missingShots();
   const toShoot = missing.reduce((a, s) => a + s.gap, 0);
   const archivedBy = Object.fromEntries(ARCHIVED.map((a) => [a.shot, a]));
+  const list = refShotList();
+  const [open, setOpen] = useState(null);
   return (
     <>
       <p className="note">
@@ -36,14 +39,23 @@ export default function IdentitySheet() {
           );
         })}
       </div>
-      <h2>רשימת הצילומים <em>{toShoot} רפרנסים · הפער בין המצב לבין מה שהמערכת דורשת</em></h2>
-      <div className="card" style={{ padding: "8px 14px" }}>
-        {missing.map((s) => (
-          <div className="crow" key={s.id}>
-            <span className="dot" style={{ background: s.have === 0 ? "#BE4C3D" : "#D9A03F" }} />
-            <span className="ctxt">{s.he}</span>
-            <span className="hint">{s.note}</span>
-            <span className="mono cpts">×{s.gap}</span>
+      <h2>רשימת הצילומים <em>{list.length} פרומפטים מוכנים · ממוין לפי כמה תנועות כל אחד פותח</em></h2>
+      <p className="note">
+        הפרומפטים ניטרליים למנוע — הזהות, הפלטה והלבוש מוזרקים מהביבליה, ואין בהם תחביר של מודל
+        מסוים. לכן ההחלטה הפתוחה על מנוע התמונה לא חוסמת את הייצור, היא רק קובעת לאן מדביקים.
+      </p>
+      <div className="card">
+        {list.map((s, i) => (
+          <div key={s.id}>
+            <div className="crow" style={{ padding: "9px 14px" }}>
+              <span className="rnum" style={{ width: 22, height: 22, fontSize: 10.5 }}>{i + 1}</span>
+              <span className="ctxt"><b>{s.angleHe}</b> · {s.variantHe}</span>
+              <span className="hint">פותח {s.unblocks} תנועות</span>
+              <button className="btn sm" onClick={() => setOpen(open === s.id ? null : s.id)}>
+                {open === s.id ? "סגור" : "פרומפט"}</button>
+            </div>
+            {open === s.id && (
+              <div style={{ padding: "0 14px 12px" }}><div className="cap" style={{ marginTop: 0 }}>{s.prompt}</div></div>)}
           </div>))}
       </div>
 
