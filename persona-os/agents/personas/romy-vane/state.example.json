@@ -1,0 +1,42 @@
+{
+  "persona": "romy-vane",
+  "source": "seed",
+  "exported_at": "2026-10-03T12:00:00.000Z",
+  "provenance": {
+    "approval_queue": "module:src/data/queue.js",
+    "schedule": "module:src/data/queue.js",
+    "posts": "seed:src/lib/history.js",
+    "credits": "none"
+  },
+  "approval_queue": [
+    {
+      "id": "q1",
+      "title": "ריל — מסדרון קומה 7, אחרי חצות",
+      "created_at": "2026-08-21T10:00:00"
+    }
+  ],
+  "schedule": [
+    {
+      "id": "q1",
+      "title": "ריל — מסדרון קומה 7",
+      "scheduled_at": "2026-08-21T22:40",
+      "pillar": "room707",
+      "channel": "Instagram",
+      "open": false
+    }
+  ],
+  "posts": [
+    {
+      "id": "vane-0",
+      "published_at": "2026-07-08",
+      "pillar": "hotels",
+      "experiment": "e1",
+      "read": true,
+      "room707": false
+    }
+  ],
+  "credits": {
+    "balance": 0,
+    "weekly_used": 0
+  }
+}

@@ -4,3 +4,7 @@ dist
 .env.local
 .DS_Store
 data/local/
+
+# Agent state and heartbeat reports are generated locally
+agents/personas/*/state.json
+agents/personas/*/reports/*.md

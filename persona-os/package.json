@@ -8,7 +8,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test \"src/**/*.test.js\""
+    "test": "node --test \"src/**/*.test.js\"",
+    "agents:export": "node scripts/export-agent-state.mjs",
+    "agents:heartbeat": "node agents/runtime/heartbeat.mjs all",
+    "agents:ctx": "node agents/runtime/assemble.mjs",
+    "agents:check": "node scripts/check-identity.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
