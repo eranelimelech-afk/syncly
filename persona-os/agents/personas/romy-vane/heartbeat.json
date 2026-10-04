@@ -1,0 +1,28 @@
+{
+  "persona": "romy-vane",
+  "_note": "Thresholds are PROPOSED starting values — an open decision in docs/DECISIONS.md. null = undecided; the heartbeat skips that check.",
+  "pillar_targets": {
+    "hotels": 0.3,
+    "morning": 0.2,
+    "fitness": 0.15,
+    "scenery": 0.15,
+    "dining": 0.1,
+    "community": 0.05,
+    "room707": 0.05
+  },
+  "thresholds": {
+    "queue_max_pending": 4,
+    "queue_max_age_hours": 48,
+    "schedule_horizon_days": 7,
+    "schedule_min_items": 5,
+    "post_gap_max_days": 2,
+    "pillar_window_posts": 30,
+    "pillar_drift_max": 0.1,
+    "unread_max": 5,
+    "experiment_min_share": 0.1,
+    "credits_min_balance": null,
+    "credits_weekly_budget": null,
+    "room707_min_gap_days": 14,
+    "room707_max_gap_days": 28
+  }
+}

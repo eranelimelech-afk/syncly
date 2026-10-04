@@ -1,6 +1,7 @@
 import React from "react";
 import { scoreOf } from "../lib/scoring.js";
 import { Kpi, fmt } from "./ui.jsx";
+import HeartbeatCard from "./HeartbeatCard.jsx";
 
 /**
  * Placeholder conversion rates for the two funnel stages the generator does not
@@ -53,6 +54,8 @@ export default function ControlRoom({ persona, posts, queue, qa, totals, openAme
         <Kpi lbl="עוקבים חדשים" val={fmt(totals.follows)} sub={`${((totals.follows / totals.reach) * 1000).toFixed(1)} ל־1,000 חשיפות`} />
         <Kpi lbl="ציון QA ממוצע" val={totals.qaAvg} sub={totals.qaAvg >= 85 ? "מעל סף השחרור" : "מתחת לסף השחרור (85)"} tone={totals.qaAvg >= 85 ? "up" : "down"} />
       </div>
+
+      <HeartbeatCard personaId={persona.id} />
 
       <h2>מה דורש ממך החלטה</h2>
       {pending.length === 0 && openAmends === 0 ? <div className="card empty">אין פריטים ממתינים.</div> : (

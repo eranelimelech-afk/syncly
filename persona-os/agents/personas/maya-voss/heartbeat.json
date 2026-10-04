@@ -1,0 +1,22 @@
+{
+  "persona": "maya-voss",
+  "_note": "Thresholds are PROPOSED starting values — an open decision in docs/DECISIONS.md. null = undecided; the heartbeat skips that check.",
+  "pillar_targets": {},
+  "thresholds": {
+    "queue_max_pending": 4,
+    "queue_max_age_hours": 48,
+    "schedule_horizon_days": 7,
+    "schedule_min_items": 3,
+    "post_gap_max_days": 2,
+    "pillar_window_posts": 30,
+    "pillar_drift_max": 0.1,
+    "unread_max": 5,
+    "experiment_min_share": 0.1,
+    "credits_min_balance": null,
+    "credits_weekly_budget": null
+  },
+  "persona_fields": {
+    "arc_week": "week of the current arc",
+    "masking": "masking flag"
+  }
+}
