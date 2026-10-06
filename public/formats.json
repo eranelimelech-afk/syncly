@@ -1,0 +1,79 @@
+{
+  "banks": {
+    "SECTORS": ["Energy","Information Technology","Industrials","Materials","Software","Cybersecurity","Semiconductors","Financials","Banks","Healthcare","Biotech","Consumer Staples","Consumer Discretionary","Real Estate","Communication Services","Utilities","Aerospace & Defense","Retail"],
+    "STOCKS": ["NVDA","MSFT","AAPL","GOOGL","AMZN","META","TSLA","AVGO","JPM","GS","MS","BAC","WFC","C","CRM","ADBE","ORCL","NOW","SNOW","MDB","CRWD","PANW","ZS","NET","PLTR","XOM","CVX","UNH","LLY","JNJ","ABBV","KO","PG","COST","WMT","HD","V","MA"],
+    "STRATS": ["Swing Trading","Day Trading","Long-term Hold","Momentum","Value","Dividend Growth","Scalping","Breakout","Mean Reversion","Trend Following","Buy & Hold","Options Income"]
+  },
+  "topSectorsFallback": [
+    {"name":"Energy", "perf":"+29%", "note":"המוביל ב-2026 — עליית מחירי נפט ומתחים גיאופוליטיים מזרימים הון לסקטור.", "tag":"Top performer"},
+    {"name":"Information Technology", "perf":"+17%", "note":"מס' 2 ב-YTD; ביקוש AI לתשתיות ממשיך לתמוך, למרות תנודתיות.", "tag":"AI demand"},
+    {"name":"Industrials", "perf":"+16%", "note":"בנייית מרכזי נתונים, חשמול, הגנה — Caterpillar ו-GE Vernova מובילים.", "tag":"AI buildout"},
+    {"name":"Materials", "perf":"+12%", "note":"התאוששות מחירי סחורות וביקוש למתכות לתשתיות AI.", "tag":"Commodities"},
+    {"name":"Software", "perf":"Rebound", "note":"זינוק ~44% מהשפל של אפריל; הסייבר מוביל (CrowdStrike, Palo Alto).", "tag":"Off the lows"}
+  ],
+  "formats": [
+    {
+      "id": 1, "title": "Market Analysis", "he": "ניתוח שוק",
+      "lede": "זיהוי מגמות, דפוסים מתהווים והזדמנויות השקעה — לפי סקטור או מניה נבחרת.",
+      "template": "Analyze the current trends in the stock market, focusing on {sel}. Identify any emerging patterns and suggest possible investment opportunities. Take into account the latest earnings reports and sector news in your analysis.",
+      "fields": [{"key":"sel","label":"סקטור או מניה","ph":"[sector or stock]","options":["@SECTORS","@STOCKS"],"free":true,"multi":true,"sectorTop":true}]
+    },
+    {
+      "id": 2, "title": "Portfolio Diversification", "he": "פיזור תיק",
+      "lede": "אסטרטגיות פיזור והקטנת סיכון לתיק קיים, כולל סקטורים ומניות מומלצים לבחינה.",
+      "template": "Given a portfolio with a combination of {sel}, suggest strategies to diversify it further and minimize risk. Include potential sectors to explore and specific stocks to consider.",
+      "fields": [{"key":"sel","label":"סקטורים / מניות בתיק","ph":"[current sectors or stocks]","options":["@SECTORS","@STOCKS"],"free":true,"multi":true,"sectorTop":true}]
+    },
+    {
+      "id": 3, "title": "Risk Management", "he": "ניהול סיכונים",
+      "lede": "טכניקות ניהול סיכון — stop-loss, פיזור וגודל פוזיציה — ביחס לאסטרטגיה נבחרת.",
+      "template": "Analyze effective risk management techniques for a stock trader. Provide detailed examples of how to implement stop-loss orders, diversification, and position sizing in a trading strategy. Use {sel} as a reference.",
+      "fields": [{"key":"sel","label":"אסטרטגיה / מניות","ph":"[trading strategy or stocks]","options":["@STRATS","@STOCKS"],"free":true}]
+    },
+    {
+      "id": 4, "title": "Technical Analysis", "he": "ניתוח טכני",
+      "lede": "הערכת תנועות מחיר, ווליום, ממוצעים נעים ו-RSI — והמלצת קנייה / מכירה / החזקה.",
+      "template": "Using technical analysis, evaluate the stocks of {sel}. Analyze recent price movements, volume, and key indicators, such as moving averages and the RSI. Provide a recommendation to buy, sell, or hold.",
+      "fields": [{"key":"sel","label":"מניות","ph":"[enter stocks]","options":["@STOCKS"],"free":true,"multi":true}]
+    },
+    {
+      "id": 5, "title": "Economic Indicators", "he": "אינדיקטורים כלכליים",
+      "lede": "כיצד תמ\"ג, אבטלה ואינפלציה משפיעים על השוק — ואיך לתרגם זאת להחלטות.",
+      "template": "Explain how various economic indicators, such as GDP, unemployment rates, and inflation, influence stock market performance. Provide examples of how investors can use these indicators to make informed decisions about {sel}.",
+      "fields": [{"key":"sel","label":"סקטור או מניות","ph":"[sector or stocks]","options":["@SECTORS","@STOCKS"],"free":true,"multi":true,"sectorTop":true}]
+    },
+    {
+      "id": 6, "title": "Value Investing", "he": "השקעות ערך",
+      "lede": "עקרונות השקעות ערך וזיהוי מניות מתומחרות בחסר — עם דוגמאות מהשוק הנוכחי.",
+      "template": "Describe the principles of value investing and how to identify undervalued stocks. Use real-world examples, including {sel}, to illustrate how investors can apply this strategy in the current market.",
+      "fields": [{"key":"sel","label":"מניות / חברות","ph":"[stocks or companies]","options":["@STOCKS"],"free":true,"multi":true}]
+    },
+    {
+      "id": 7, "title": "Market Sentiment", "he": "סנטימנט שוק",
+      "lede": "השפעת הסנטימנט על מחירים, וכלים למדידתו ולשילובו באסטרטגיית מסחר.",
+      "template": "Analyze how market sentiment influences stock prices. Discuss the tools and techniques that investors can use to assess sentiment and incorporate it into their trading strategies. Focus on {sel}.",
+      "fields": [{"key":"sel","label":"מניה או סקטור","ph":"[stock or sector]","options":["@SECTORS","@STOCKS"],"free":true,"multi":true,"sectorTop":true}]
+    },
+    {
+      "id": 8, "title": "Results Reports", "he": "דוחות כספיים",
+      "lede": "איך לקרוא דוח תוצאות — המדדים המרכזיים והשפעתם על מחיר המניה.",
+      "template": "Explain how to interpret a company's results report. Highlight the key metrics that investors should focus on and how these metrics can affect stock prices. Use {sel}'s latest results report as an example.",
+      "fields": [{"key":"sel","label":"חברה","ph":"[company]","options":["@STOCKS"],"free":true}]
+    },
+    {
+      "id": 9, "title": "Growth vs Dividend", "he": "צמיחה מול דיבידנד",
+      "lede": "השוואת מניות צמיחה למניות דיבידנד — יתרונות, סיכונים ומתי כל אחת מתאימה.",
+      "template": "Compare and contrast growth stocks and dividend stocks. Analyze the advantages and risks of each type of investment and suggest situations in which one might be more suitable than the other. Reference {growth} as growth stocks and {div} as dividend stocks.",
+      "fields": [
+        {"key":"growth","label":"מניות צמיחה","ph":"[growth stocks]","options":["NVDA","MSFT","CRM","CRWD","MDB","TSLA","PLTR","NOW","SNOW","NET","AMZN","META"],"free":true,"multi":true},
+        {"key":"div","label":"מניות דיבידנד","ph":"[dividend stocks]","options":["JPM","XOM","KO","PG","JNJ","VZ","CVX","ABBV","MO","T","PEP","O"],"free":true,"multi":true}
+      ]
+    },
+    {
+      "id": 10, "title": "World Events Impact", "he": "השפעת אירועי עולם",
+      "lede": "השפעת אירועים גלובליים (מתחים גיאופוליטיים, מגפות) על השוק ואיך להגן על התיק.",
+      "template": "Analyze the impact of major world events (for example, geopolitical tensions, pandemics) on the stock market. Provide strategies for investors to protect their portfolios during such events. Consider the impact on {sel}.",
+      "fields": [{"key":"sel","label":"סקטור או מניה","ph":"[sector or stock]","options":["@SECTORS","@STOCKS"],"free":true,"multi":true,"sectorTop":true}]
+    }
+  ]
+}
